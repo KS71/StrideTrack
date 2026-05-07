@@ -28,7 +28,6 @@ A user-friendly Android app (.apk) designed to help you track your walks, set pe
 </div>
 <br />
 <div align="center">
-  <img src="006.jpg" width="300" alt="Goal Setup 2" />
   &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="ny_settings.jpg" width="300" alt="Settings Updates" />
 </div>
