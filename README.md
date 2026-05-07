@@ -19,9 +19,7 @@ A user-friendly Android app (.apk) designed to help you track your walks, set pe
 </div>
 <br />
 <div align="center">
-  <img src="003.jpg" width="300" alt="History" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="005a.jpg" width="300" alt="New Screenshot 3" />
+  <img src="003.jpg" width="300" alt="History" />  
 </div>
 <br />
 <div align="center">
