@@ -1,6 +1,6 @@
-# WalkGoal - Website Beskrivelse
+# StrideTrack - Website Beskrivelse
 
-Dette dokument beskriver en konceptuel hjemmeside designet til at vise **WalkGoal** appen frem. Beskrivelsen tager udgangspunkt i appens nuværende funktionalitet, design (Dark Mode/Glassmorphism) og unikke features.
+Dette dokument beskriver en konceptuel hjemmeside designet til at vise **StrideTrack** appen frem. Beskrivelsen tager udgangspunkt i appens nuværende funktionalitet, design (Dark Mode/Glassmorphism) og unikke features.
 
 ---
 

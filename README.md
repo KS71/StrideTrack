@@ -1,4 +1,4 @@
-# 🚶‍♂️ WalkGoal
+# 🚶‍♂️ StrideTrack
 
 100% vibe code
 
@@ -6,7 +6,7 @@
 
 A user-friendly Android app (.apk) designed to help you track your walks, set personal goals, and keep track of them. The app is built with a focus on seamless mobile user experience.
 
-> **Note:** WalkGoal does *not* use your phone's GPS to automatically track your walks. You must use another device (like a smartwatch or another tracking app) to record your distance and then manually log it in WalkGoal.
+> **Note:** StrideTrack does *not* use your phone's GPS to automatically track your walks. You must use another device (like a smartwatch or another tracking app) to record your distance and then manually log it in StrideTrack.
 
 ---
 
@@ -47,7 +47,7 @@ A user-friendly Android app (.apk) designed to help you track your walks, set pe
 
 ## 🔒 Data & Privacy
 
-WalkGoal is built with a 100% focus on your privacy:
+StrideTrack is built with a 100% focus on your privacy:
 - **No Server:** The app sends **no** data, logs, or personal information to a cloud server.
 - **Your Data is Yours:** Everything you enter (how far you walk, times, goals, etc.) is saved **locally on your own phone**. No one else but you has access to it.
 - **Remember Backups:** Because the data is only on your device, it is **very important** that you regularly use the app's built-in "Backup" feature ("Export Data" in Settings). If you lose your phone or delete the app, your data is gone unless you have a backup file!
@@ -88,6 +88,11 @@ To run the project locally on your own machine:
 ## 👨‍💻 Development & History
 
 The app is continuously updated.
+
+**v2.1.5:**
+- **Yearly Overview:** All months now consistently show the distance walked.
+- **History:** Monthly group headers now turn green when the goal for that month is reached.
+- **Settings:** Removed Daily Reminders. Updated the Roadmap to include Google Health Connect Integration.
 
 **v2.1.4:**
 - **Monthly History Grouping:** Walks in the History tab are now automatically grouped by month with collapsible sections.

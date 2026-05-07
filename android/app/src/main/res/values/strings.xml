@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">WalkGoal Tracker</string>
-    <string name="title_activity_main">WalkGoal Tracker</string>
+    <string name="app_name">StrideTrack</string>
+    <string name="title_activity_main">StrideTrack</string>
     <string name="package_name">com.walkgoal.app</string>
     <string name="custom_url_scheme">com.walkgoal.app</string>
 </resources>

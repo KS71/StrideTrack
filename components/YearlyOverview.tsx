@@ -168,9 +168,9 @@ const YearlyOverview: React.FC<YearlyOverviewProps> = ({ state, units, weekStart
                                     }`}
                             >
                                 <span className={`font-black uppercase text-xs ${month.hasWalk ? 'text-black' : 'text-gray-500'}`}>{month.monthName}</span>
-                                {month.hasWalk && (
-                                    <span className="font-bold text-sm mt-1">{toDisplayDistance(month.distance, units)}</span>
-                                )}
+                                <span className={`font-bold text-sm mt-1 ${month.hasWalk ? 'text-black' : 'text-gray-500'}`}>
+                                    {toDisplayDistance(month.distance, units)}
+                                </span>
                             </div>
                         ))}
                     </div>

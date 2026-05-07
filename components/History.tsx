@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { AppState, WalkLog } from '../types';
-import { toDisplayDistance, getUnitLabel } from '../utils';
+import { toDisplayDistance, getUnitLabel, getGoalForDate } from '../utils';
 import { Clock, Trash2, Footprints, Settings, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface HistoryProps {
@@ -225,10 +225,13 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
             // Format nice label like "April 2026"
             const [year, monthNum] = monthKey.split('-');
             const dateObj = new Date(parseInt(year), parseInt(monthNum) - 1, 1);
+            const monthEndDay = new Date(parseInt(year), parseInt(monthNum), 0, 23, 59, 59, 999);
+            const historicalGoal = getGoalForDate(monthEndDay, state).month;
             const displayLabel = dateObj.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
             // Calculate total distance for this month
             const monthTotal = logsInMonth.reduce((acc, log) => acc + log.distance, 0);
+            const hasReachedGoal = monthTotal >= historicalGoal;
             const displayMonthTotal = toDisplayDistance(monthTotal, units);
             const unitLabel = getUnitLabel(units);
 
@@ -236,7 +239,7 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
               <div key={monthKey} className="mb-6">
                 <button 
                   onClick={() => toggleMonth(monthKey)}
-                  className={`w-full flex items-center justify-between border-[3px] border-black py-2.5 px-3 shadow-hard active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all ${isExpanded ? 'bg-primary' : 'bg-white'}`}
+                  className={`w-full flex items-center justify-between border-[3px] border-black py-2.5 px-3 shadow-hard active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all ${hasReachedGoal ? 'bg-[#13ec49]' : (isExpanded ? 'bg-primary' : 'bg-white')}`}
                 >
                   <span className="font-black text-sm tracking-wider text-black uppercase flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
                     {displayLabel} - {displayMonthTotal} <span className="text-[10px]">{unitLabel.toLowerCase()}</span>

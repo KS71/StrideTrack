@@ -83,21 +83,7 @@ const Settings: React.FC<SettingsProps> = ({
 
       <div className="flex-1 overflow-y-auto space-y-8 pb-8 scrollbar-hide">
 
-        {/* Profile Card */}
-        <div className="bg-primary border-[3px] border-black shadow-hard p-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="h-16 w-16 bg-white border-[3px] border-black flex items-center justify-center shadow-none">
-              <span className="text-2xl font-black text-black">JD</span>
-            </div>
-            <div>
-              <h2 className="text-xl font-black leading-none text-black">John Doe</h2>
-              <p className="text-sm font-bold opacity-80 mt-1 text-black">Basic Member</p>
-            </div>
-          </div>
-          <button className="h-10 w-10 bg-white border-[3px] border-black flex items-center justify-center hover:bg-gray-100 active:translate-x-[2px] active:translate-y-[2px] transition-all shadow-none">
-            <User size={20} className="text-black" strokeWidth={2.5} />
-          </button>
-        </div>
+
 
         {/* Preferences */}
         <div>
@@ -151,21 +137,7 @@ const Settings: React.FC<SettingsProps> = ({
               </div>
             </div>
 
-            {/* Notifications */}
-            <div className="bg-white border-[3px] border-black shadow-hard p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="bg-orange-200 border-[3px] border-black w-10 h-10 flex items-center justify-center shadow-none">
-                  <Bell size={20} className="text-black" strokeWidth={2.5} />
-                </div>
-                <span className="font-bold text-black">Daily Reminders</span>
-              </div>
-              <button
-                onClick={() => onUpdatePreferences({ notifications: !preferences.notifications })}
-                className={`w-14 h-8 border-[3px] border-black p-0.5 transition-colors relative ${preferences.notifications ? 'bg-black' : 'bg-white'}`}
-              >
-                <div className={`w-6 h-6 border-[3px] border-black transition-transform ${preferences.notifications ? 'translate-x-6 bg-accent-pink' : 'translate-x-0 bg-gray-300'}`} />
-              </button>
-            </div>
+
 
             {/* Time Format */}
             <div className="bg-white border-[3px] border-black shadow-hard p-4 flex items-center justify-between">
@@ -314,7 +286,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.1.4</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.1.5</span>
             </div>
           </div>
         </div>
@@ -364,9 +336,7 @@ const Settings: React.FC<SettingsProps> = ({
         icon={<Rocket size={24} className="text-black" strokeWidth={2.5} />}
       >
         <ul className="list-disc pl-5 space-y-2">
-          <li>Cloud Sync (Cross-device support)</li>
-          <li>GPS Tracking (Auto-log walks)</li>
-          <li>Social Features (Compete with friends)</li>
+          <li>Google Health Connect Integration</li>
           <li>Achievements & Badges</li>
           <li>Dark Mode (The Real One)</li>
         </ul>
