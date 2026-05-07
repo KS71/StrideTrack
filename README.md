@@ -23,16 +23,17 @@ A user-friendly Android app (.apk) designed to help you track your walks, set pe
     &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="002b.jpg" width="300" alt="New Screenshot 2" />
 </div>
-<br />
-<div align="center">
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="ny_settings.jpg" width="300" alt="Settings Updates" />
-</div>
+
 <br />
 <div align="center">
   <img src="ny_history.jpg" width="300" alt="History Updates" />
   &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="ny_yearly.jpg" width="300" alt="Yearly Overview" />
+</div>
+<br />
+<div align="center">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="ny_settings.jpg" width="300" alt="Settings Updates" />
 </div>
 
 ---
