@@ -70,7 +70,7 @@ const Settings: React.FC<SettingsProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-background-light pb-24 animate-fade-in px-5 pt-8">
+    <div className="flex flex-col min-h-full bg-background-light animate-fade-in px-5 pt-8 pb-4">
       <div className="flex items-center justify-between border-b-[3px] border-black pb-2 mb-8">
         <h1 className="text-4xl font-black uppercase tracking-tight text-black">Settings</h1>
         <button
@@ -81,7 +81,7 @@ const Settings: React.FC<SettingsProps> = ({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-8 pb-8 scrollbar-hide">
+      <div className="flex-1 space-y-8 pb-8">
 
 
 
@@ -286,7 +286,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.1.5</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.1.6</span>
             </div>
           </div>
         </div>

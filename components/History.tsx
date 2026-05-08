@@ -169,7 +169,7 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-background-light pb-32 animate-fade-in relative">
+    <div className="flex flex-col min-h-full bg-background-light pb-4 animate-fade-in relative">
       {/* Timeline Background Line (Line running through entire list) */}
       <div className="absolute left-[33px] top-32 bottom-0 w-1 bg-black z-0 hidden"></div>
       {/* I'll let individual items handle the line segments for easier rendering */}

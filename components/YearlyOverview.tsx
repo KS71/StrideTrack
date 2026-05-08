@@ -108,10 +108,10 @@ const YearlyOverview: React.FC<YearlyOverviewProps> = ({ state, units, weekStart
 
 
     return (
-        <div className="flex flex-col h-full bg-background-light pb-20">
+        <div className="flex flex-col min-h-full bg-background-light pb-4">
             {/* Header - removed to match Dashboard offset */}
 
-            <main className="flex-1 overflow-y-auto px-4 pt-12 space-y-6 scrollbar-hide">
+            <main className="flex-1 px-4 pt-12 space-y-6 pb-8">
                 <h1 className="text-2xl font-black uppercase tracking-tight text-black mb-2" style={{ WebkitTextStroke: '1px black' }}>
                     Yearly Progress
                 </h1>

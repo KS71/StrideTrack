@@ -62,7 +62,7 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
   const dailySteps = steps;
 
   return (
-    <div className="flex flex-col h-full bg-background-light font-display pb-20">
+    <div className="flex flex-col min-h-full bg-background-light font-display pb-4">
       {/* Header */}
       <div className="border-b-4 border-black bg-white px-4 pt-12 pb-3 sticky top-0 z-20">
         <div className="flex items-center justify-between">
@@ -78,7 +78,7 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col p-4 gap-3 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 flex flex-col p-4 gap-3 pb-8">
 
         {/* Yellow Header Card - Compact */}
         <div className="bg-primary border-4 border-black p-2 shadow-hard relative overflow-hidden">
@@ -190,8 +190,7 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
 
       </div>
 
-      {/* Navigation Menu */}
-      <Navigation currentView={currentView} onChange={onChangeView} />
+
     </div>
   );
 };

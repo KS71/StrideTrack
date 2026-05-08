@@ -1,7 +1,7 @@
 {
   "name": "walkgoal",
   "private": true,
-  "version": "2.1.5",
+  "version": "2.1.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +14,7 @@
     "@capacitor/core": "^8.0.1",
     "@capacitor/filesystem": "^8.1.0",
     "@capacitor/share": "^8.0.0",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

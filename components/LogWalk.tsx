@@ -82,7 +82,7 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
   const unitLabel = getUnitLabel(units);
 
   return (
-    <div className="flex flex-col h-full bg-background-light font-display pb-20">
+    <div className="flex flex-col min-h-full bg-background-light font-display pb-4">
       <header className="flex justify-between items-center px-6 pt-8 pb-2">
         <h1 className="text-2xl font-black text-black uppercase tracking-wider">Log Walk</h1>
         <button
@@ -92,7 +92,7 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
         </button>
       </header>
 
-      <main className="flex-1 px-6 flex flex-col items-center justify-start gap-4 pt-2 pb-4 overflow-y-auto scrollbar-hide">
+      <main className="flex-1 px-6 flex flex-col items-center justify-start gap-4 pt-2 pb-8">
         {/* Visual Sticker Container for Input - Reduced Height */}
         <div className="w-full max-w-sm h-64 flex flex-col items-center justify-center bg-accent-pink border-[4px] border-black shadow-hard rounded-none relative overflow-hidden group shrink-0">
           <div className="absolute top-0 right-0 w-16 h-16 bg-white border-l-[4px] border-b-[4px] border-black rounded-none"></div>
@@ -183,8 +183,6 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
 
       </main>
 
-      {/* Navigation Menu */}
-      <Navigation currentView={currentView} onChange={onChangeView} />
     </div>
   );
 };
