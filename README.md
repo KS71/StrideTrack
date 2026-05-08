@@ -91,6 +91,9 @@ To run the project locally on your own machine:
 
 The app is continuously updated.
 
+**v2.1.6:**
+- **Swipe Navigation:** You can now smoothly swipe left and right to navigate between the different pages in the app.
+
 **v2.1.5:**
 - **Yearly Overview:** All months now consistently show the distance walked.
 - **History:** Monthly group headers now turn green when the goal for that month is reached.
