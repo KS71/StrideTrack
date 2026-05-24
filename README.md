@@ -91,6 +91,12 @@ To run the project locally on your own machine:
 
 The app is continuously updated.
 
+**v2.2.0:**
+- **Cloud Sync Integration:** Securely back up all your walking logs, goals, and settings in the cloud using Supabase. Logs are seamlessly synchronized between device local storage and your database.
+- **Double Password Verification:** Added confirmation input on registration modal to ensure accurate profile password setup.
+- **English Localization:** Translated and standardized all new Settings UI elements, modals, and synchronizing workflows to match the rest of the application.
+- **Local Data Backup Clarity:** Refined Settings category and descriptions to clearly distinguish local file backups from cloud sync.
+
 **v2.1.6:**
 - **Swipe Navigation:** You can now smoothly swipe left and right to navigate between the different pages in the app.
 

@@ -1,7 +1,7 @@
 {
   "name": "walkgoal",
   "private": true,
-  "version": "2.1.6",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",
+    "@capacitor/app": "^8.1.0",
     "@capacitor/cli": "^8.0.1",
     "@capacitor/core": "^8.0.1",
     "@capacitor/filesystem": "^8.1.0",
     "@capacitor/share": "^8.0.0",
+    "@supabase/supabase-js": "^2.106.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",

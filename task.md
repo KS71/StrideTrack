@@ -29,6 +29,7 @@ This file tracks the development progress of the WalkGoal PWA. It is stored in t
   - *Note: Requires Android Studio to build final APK.*
 - [ ] **Data Visualization**: Add graphs (bar/line charts) for better historical insight.
 - [ ] **Gamification**: Add badges or streak counters to motivate the user.
-- [ ] **Cloud Sync**: Optional integration with a backend (Supabase/Firebase) instead of just local storage.
+- [ ] **Cloud Sync (Supabase)**: Optional hybrid cloud sync (Local-first + Supabase PostgreSQL) to secure user data with custom email login.
 - [x] **Localization**: Support for miles vs km and Week Start (Mon/Sun).
 - [ ] **PWA Refinement**: Ensure "Install App" prompt works smoothly on mobile.
+- [ ] **Integrations (Strava & Health Connect)**: Add settings toggles and a manual "Sync Now" button to automatically import walks from Garmin/Strava/Health apps.

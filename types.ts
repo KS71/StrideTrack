@@ -29,6 +29,7 @@ export interface UserPreferences {
   weekStart: 'monday' | 'sunday';
   timeFormat: '12h' | '24h';
   lastBackupDate?: string;
+  lastSyncDate?: string;
 }
 
 export interface AppState {
