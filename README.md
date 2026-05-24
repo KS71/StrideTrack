@@ -49,11 +49,12 @@ A user-friendly Android app (.apk) designed to help you track your walks, set pe
 
 ## 🔒 Data & Privacy
 
-StrideTrack is built with a 100% focus on your privacy:
-- **No Server:** The app sends **no** data, logs, or personal information to a cloud server.
-- **Your Data is Yours:** Everything you enter (how far you walk, times, goals, etc.) is saved **locally on your own phone**. No one else but you has access to it.
-- **Remember Backups:** Because the data is only on your device, it is **very important** that you regularly use the app's built-in "Backup" feature ("Export Data" in Settings). If you lose your phone or delete the app, your data is gone unless you have a backup file!
-- **Future Account Management:** We are considering adding some form of account management in the future. Because this would require an online server (and thus go against the app's current core philosophy of 100% local data storage), it hasn't been finally decided yet. If it is ever developed, it will most likely be introduced as an active, voluntary choice (opt-in), so you can continue to use the app 100% locally and privately if you prefer.
+StrideTrack is built with a 100% focus on user privacy and data ownership, employing a **Local-First with Opt-In Cloud Sync** philosophy:
+
+- **Local-First by Default:** Everything you enter (how far you walk, times, goals, preferences) is saved **locally on your own phone**. The app works 100% offline and does not require an account to use. No one else has access to your local data.
+- **Voluntary Cloud Backup (Opt-In):** We have integrated a secure, voluntary cloud backup system using **Supabase**. If you choose to connect a profile, your walk logs and goals will be automatically backed up in the cloud, protecting your history from physical device loss or app deletion.
+- **Database-Level Protection:** When using cloud sync, your data is secured at the lowest database engine level using PostgreSQL **Row-Level Security (RLS)**. Only your authenticated user account has permission to read, write, or modify your walking data.
+- **Offline / Local Backups:** If you prefer not to use the cloud, you can still manually export and import your complete walking history as a local backup file at any time via the settings.
 
 ## 🛠️ Technologies
 
