@@ -1,3 +1,4 @@
+<img width="1080" height="4302" alt="Settings" src="https://github.com/user-attachments/assets/32d15b5f-b333-4cfd-86c4-574434616169" />
 # 🚶‍♂️ StrideTrack
 
 100% vibe code
