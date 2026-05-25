@@ -11,38 +11,9 @@ interface HistoryProps {
   timeFormat: '12h' | '24h';
 }
 
-const SwipeableHistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLast: boolean; units: 'km' | 'mi'; index: number; timeFormat: '12h' | '24h' }> = ({ log, onDelete, isLast, units, index, timeFormat }) => {
-  const [offset, setOffset] = useState(0);
-  const startX = useRef<number | null>(null);
-  const isDragging = useRef(false);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX;
-    isDragging.current = true;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!startX.current || !isDragging.current) return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX.current;
-    if (diff < 0) {
-      setOffset(Math.max(diff, -120));
-    }
-  };
-
-  const handleTouchEnd = () => {
-    isDragging.current = false;
-    startX.current = null;
-    if (offset < -50) {
-      setOffset(-110);
-    } else {
-      setOffset(0);
-    }
-  };
-
-  const handleClick = () => {
-    if (offset < 0) setOffset(0);
-  };
+const HistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLast: boolean; units: 'km' | 'mi'; index: number; timeFormat: '12h' | '24h' }> = ({ log, onDelete, isLast, units, index, timeFormat }) => {
+  const [isPressing, setIsPressing] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const date = new Date(log.date);
   const day = date.getDate();
@@ -55,7 +26,6 @@ const SwipeableHistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => v
   const weekdayName = date.toLocaleString('en-US', { weekday: 'long' });
 
   // Determine display title
-  // If title is missing, OR matches generic generated titles, use weekday name
   const isGenericTitle = !log.title || log.title === 'New Walk' || log.title === 'Walk';
   const displayTitle = isGenericTitle ? weekdayName : log.title;
 
@@ -65,10 +35,56 @@ const SwipeableHistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => v
   // Rotate colors for variety
   const colors = ['bg-accent-pink', 'bg-primary', 'bg-teal-accent', 'bg-white'];
   const dateBoxColor = colors[index % colors.length];
-  const isDarkBox = dateBoxColor === 'bg-black'; // Not used in current rotation but good for logic check
+
+  const startPress = () => {
+    setIsPressing(true);
+    timerRef.current = setTimeout(() => {
+      setIsPressing(false);
+      if (window.confirm(`Delete this walk (${displayDistance} ${unitLabel.toLowerCase()}) from your history? It will also be deleted from the cloud sync.`)) {
+        onDelete(log.id);
+      }
+    }, 800); // 800ms hold time
+  };
+
+  const endPress = () => {
+    setIsPressing(false);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const handleTouchStart = () => {
+    startPress();
+  };
+
+  const handleTouchEnd = () => {
+    endPress();
+  };
+
+  const handleTouchMove = () => {
+    // If they scroll or move finger, cancel hold instantly
+    endPress();
+  };
+
+  const handleMouseDown = () => {
+    startPress();
+  };
+
+  const handleMouseUp = () => {
+    endPress();
+  };
+
+  const handleMouseLeave = () => {
+    endPress();
+  };
+
+  const cardClass = isPressing
+    ? "relative bg-red-50 border-[3px] border-red-700 shadow-none translate-y-1 scale-[0.98] transition-all duration-300 cursor-pointer"
+    : "relative bg-white border-[3px] border-black shadow-hard transform transition-all duration-200 hover:translate-y-[-2px] hover:shadow-hard-lg cursor-pointer";
 
   return (
-    <div className="relative pl-8 mb-6 group">
+    <div className="relative pl-8 mb-6 group animate-fade-in select-none">
       {/* Timeline Line */}
       {!isLast && <div className="absolute left-[9px] top-8 bottom-[-30px] w-1 bg-black z-0"></div>}
 
@@ -76,32 +92,26 @@ const SwipeableHistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => v
       <div className="absolute left-0 top-6 h-5 w-5 rounded-full border-[3px] border-black bg-white z-10 group-hover:scale-125 transition-transform"></div>
 
       <div className="relative overflow-hidden rounded-none">
-        {/* Delete Action Background */}
-        <div className="absolute inset-0 flex items-center justify-end bg-red-100 border-[3px] border-black pr-5">
-          <button onClick={() => onDelete(log.id)} className="text-red-600 flex items-center gap-2 font-bold uppercase tracking-wider">
-            <Trash2 size={20} /> Delete
-          </button>
-        </div>
-
         {/* Content Card */}
-        <div
-          className="relative bg-white border-[3px] border-black shadow-hard transform transition-all duration-200 active:bg-gray-50 hover:translate-y-[-2px] hover:shadow-hard-lg"
-          style={{ transform: `translateX(${offset}px)` }}
+        <div 
+          className={cardClass}
           onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          onClick={handleClick}
+          onTouchMove={handleTouchMove}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
         >
           <div className="flex">
             {/* Date Box */}
-            <div className={`w-20 flex flex-col justify-center items-center border-r-[3px] border-black p-2 ${dateBoxColor}`}>
+            <div className={`w-20 flex flex-col justify-center items-center border-r-[3px] border-black p-2 shrink-0 ${isPressing ? 'bg-red-200 border-red-700' : dateBoxColor}`}>
               <span className="font-black text-xs uppercase text-black">{month}</span>
               <span className="font-black text-3xl text-black">{day}</span>
             </div>
 
             {/* Info */}
-            <div className="flex-1 p-4 flex justify-between items-center">
-              <div className="min-w-0">
+            <div className="flex-1 p-4 flex justify-between items-center min-w-0">
+              <div className="min-w-0 flex-1 pr-2">
                 <h3 className="font-black text-sm leading-none mb-1 text-black truncate">{displayTitle}</h3>
                 <div className="flex items-center gap-1 text-gray-600 text-sm font-bold">
                   <Clock size={14} strokeWidth={2.5} />
@@ -109,9 +119,11 @@ const SwipeableHistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => v
                 </div>
               </div>
 
-              <div className="text-right">
-                <div className="font-black text-2xl text-black">{displayDistance}</div>
-                <div className="text-xs font-bold uppercase bg-black text-white px-1 inline-block">{unitLabel}</div>
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="text-right">
+                  <div className="font-black text-2xl text-black leading-none">{displayDistance}</div>
+                  <div className="text-[10px] font-bold uppercase bg-black text-white px-1.5 py-0.5 inline-block mt-1 leading-none">{unitLabel}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -186,6 +198,9 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
                 {state.logs.length} sessions logged
               </p>
             </div>
+            <span className="text-[10px] uppercase font-black tracking-wider text-black/45 mt-0.5 animate-pulse">
+              💡 Tip: Hold a walk to delete it
+            </span>
           </div>
           {/* Settings Button */}
           <button
@@ -250,7 +265,7 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
                 {isExpanded && (
                   <div className="flex flex-col pt-6 transition-all duration-300 animate-fade-in">
                     {logsInMonth.map((log, index) => (
-                      <SwipeableHistoryItem
+                      <HistoryItem
                         key={log.id}
                         log={log}
                         index={index}
