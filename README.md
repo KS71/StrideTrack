@@ -90,7 +90,9 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
-The app is continuously updated.
+**v2.2.1:**
+- **Press-and-Hold Deletion:** Replaced the touch-swipe-to-delete item gesture on History with an elegant, responsive press-and-hold (long press) gesture. This completely avoids touch conflicts with side-swipe page navigation.
+- **Improved Spacing Layout:** Decreased vertical empty space on the History tab between the header tip and the stats cards row for a more compact and readable mobile display.
 
 **v2.2.0:**
 - **Cloud Sync Integration:** Securely back up all your walking logs, goals, and settings in the cloud using Supabase. Logs are seamlessly synchronized between device local storage and your database.

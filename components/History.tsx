@@ -187,7 +187,7 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
       {/* I'll let individual items handle the line segments for easier rendering */}
 
       {/* Header */}
-      <header className="px-6 pt-8 pb-4">
+      <header className="px-6 pt-8 pb-0">
         <div className="flex justify-between items-start">
           <div className="flex flex-col items-start gap-2">
             <h1 className="text-5xl font-black tracking-tighter text-black uppercase leading-none">
@@ -212,7 +212,7 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
       </header>
 
       {/* Stats Cards Row */}
-      <div className="px-6 my-6 grid grid-cols-2 gap-4">
+      <div className="px-6 mt-2 mb-6 grid grid-cols-2 gap-4">
         <div className="bg-teal-accent border-[3px] border-black p-4 shadow-hard hover:scale-[1.02] transition-transform">
           <span className="text-xs font-bold uppercase tracking-widest border-b-2 border-black inline-block mb-2 text-black">Total Dist</span>
           <p className="font-black text-2xl text-black">
