@@ -33,7 +33,6 @@ A user-friendly Android app (.apk) designed to help you track your walks, set pe
 <br />
 <div align="center">
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img width="1080" height="4302" alt="Settings" src="https://github.com/user-attachments/assets/32d15b5f-b333-4cfd-86c4-574434616169" />
   <img width="1080" height="5360" alt="Settings230" src="https://github.com/user-attachments/assets/94607796-bc61-4d07-9415-66eee8848113" />
 
 </div>
