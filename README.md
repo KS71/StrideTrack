@@ -6,7 +6,7 @@
 
 A user-friendly Android app (.apk) designed to help you track your walks, set personal goals, and keep track of them. The app is built with a focus on seamless mobile user experience.
 
-> **Note:** StrideTrack does *not* use your phone's GPS to automatically track your walks. You must use another device (like a smartwatch or another tracking app) to record your distance and then manually log it in StrideTrack.
+> **Note:** StrideTrack now supports **Google Health Connect**! You can automatically sync walking and hiking sessions directly from smartwatches (like Garmin, Samsung Galaxy, and Fitbit) or companion apps without manual entry.
 
 ---
 
@@ -89,6 +89,14 @@ To run the project locally on your own machine:
    ```
 
 ## 👨‍💻 Development & History
+
+**v2.3.0:**
+- **Google Health Connect Integration:** Automatically sync walks and hikes directly from smartwatches (Garmin, Samsung, Fitbit) and companion apps.
+- **Selective Source Filtering (No Double-Counting):** Prioritizes GPS smartwatch distance over phone background step sensors to prevent double-counting.
+- **De-duplication & Local Deletion Memory:** Prevents duplicates with deterministic ID mapping and remembers deleted Health Connect activities so they do not reappear on subsequent syncs.
+- **In-App English Setup Guide:** Added a step-by-step setup and troubleshooting guide explaining connections and permission management.
+- **Direct System Settings Shortcuts:** Easily adjust, grant, or revoke individual Health Connect permissions directly from the Settings menu.
+- **Weekday Formatting:** Formats synced walks with matching generic weekday titles (e.g. "Wednesday") to align with manual logs.
 
 **v2.2.1:**
 - **Press-and-Hold Deletion:** Replaced the touch-swipe-to-delete item gesture on History with an elegant, responsive press-and-hold (long press) gesture. This completely avoids touch conflicts with side-swipe page navigation.

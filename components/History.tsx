@@ -26,7 +26,7 @@ const HistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLa
   const weekdayName = date.toLocaleString('en-US', { weekday: 'long' });
 
   // Determine display title
-  const isGenericTitle = !log.title || log.title === 'New Walk' || log.title === 'Walk';
+  const isGenericTitle = !log.title || log.title === 'New Walk' || log.title === 'Walk' || log.title === 'Walking' || log.title === 'Hiking';
   const displayTitle = isGenericTitle ? weekdayName : log.title;
 
   const displayDistance = toDisplayDistance(log.distance, units);

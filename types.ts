@@ -9,6 +9,8 @@ export interface WalkLog {
   title: string;
   steps?: number;
   intensity?: 'Low' | 'Medium' | 'High';
+  calories?: number;
+  source?: string;
 }
 
 export interface Goals {
@@ -30,6 +32,8 @@ export interface UserPreferences {
   timeFormat: '12h' | '24h';
   lastBackupDate?: string;
   lastSyncDate?: string;
+  healthConnectSync?: boolean;
+  healthConnectSyncDate?: string;
 }
 
 export interface AppState {
@@ -38,6 +42,7 @@ export interface AppState {
   goalHistory?: GoalHistoryEntry[];
   activePeriod: Period;
   preferences: UserPreferences;
+  deletedHealthConnectIds?: string[];
 }
 
 export type View = 'dashboard' | 'history' | 'log' | 'goal-setup' | 'settings' | 'yearly-overview';

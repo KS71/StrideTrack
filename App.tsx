@@ -12,6 +12,7 @@ import GoalSetup from './components/GoalSetup';
 import Settings from './components/Settings';
 import Navigation from './components/Navigation';
 import YearlyOverview from './components/YearlyOverview';
+import { fetchRecentWalksAndHikes, isHealthConnectAvailable } from './utils/healthConnect';
 import { supabase } from './supabaseClient';
 import { X, Lock, RefreshCw } from 'lucide-react';
 
@@ -34,7 +35,8 @@ const INITIAL_STATE: AppState = {
     units: 'km',
     weekStart: 'monday',
     timeFormat: '24h'
-  }
+  },
+  deletedHealthConnectIds: []
 };
 
 const STORAGE_KEY = 'walkgoal_tracker_data_v1';
@@ -44,6 +46,7 @@ const App: React.FC = () => {
   const [direction, setDirection] = useState(0);
   const [user, setUser] = useState<any>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isHealthSyncing, setIsHealthSyncing] = useState(false);
 
   // Password Recovery Modal States
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
@@ -272,10 +275,8 @@ const App: React.FC = () => {
       // 3. Sync Walks
       const localWalks = currentState.logs;
       const walksToUpload: any[] = [];
-      const mergedWalks = [...localWalks];
 
       const remoteWalksMap = new Map(remoteWalks.map(w => [w.id, w]));
-      const localWalksMap = new Map(localWalks.map(w => [w.id, w]));
 
       // Upload walks that only exist locally
       for (const lw of localWalks) {
@@ -297,24 +298,6 @@ const App: React.FC = () => {
         const { error: uploadError } = await supabase.from('walks').insert(walksToUpload);
         if (uploadError) throw uploadError;
       }
-
-      // Download walks that only exist remotely
-      for (const rw of remoteWalks) {
-        if (!localWalksMap.has(rw.id)) {
-          mergedWalks.push({
-            id: rw.id,
-            date: rw.date,
-            distance: Number(rw.distance),
-            duration: rw.duration,
-            title: rw.title,
-            steps: rw.steps || undefined,
-            intensity: (rw.intensity as any) || undefined
-          });
-        }
-      }
-
-      // Sort walks by date descending
-      mergedWalks.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       // 4. Sync Profile / Goals & Preferences
       let finalGoals = currentState.goals;
@@ -356,17 +339,43 @@ const App: React.FC = () => {
         updated_at: new Date().toISOString()
       });
 
-      // Update state with synchronized values
-      setState(prev => ({
-        ...prev,
-        logs: mergedWalks,
-        goals: finalGoals,
-        preferences: {
-          ...prev.preferences,
-          ...finalPref,
-          lastSyncDate: new Date().toISOString()
+      // Update state with synchronized values, merging remote walks into the LATEST local logs (prev.logs)
+      // to prevent overwriting walks that were added while the async sync was in progress (race conditions)
+      setState(prev => {
+        const localWalksMap = new Map(prev.logs.map(w => [w.id, w]));
+        const mergedWalks = [...prev.logs];
+        let hasChanges = false;
+
+        for (const rw of remoteWalks) {
+          if (!localWalksMap.has(rw.id)) {
+            mergedWalks.push({
+              id: rw.id,
+              date: rw.date,
+              distance: Number(rw.distance),
+              duration: rw.duration,
+              title: rw.title,
+              steps: rw.steps || undefined,
+              intensity: (rw.intensity as any) || undefined
+            });
+            hasChanges = true;
+          }
         }
-      }));
+
+        if (hasChanges) {
+          mergedWalks.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        }
+
+        return {
+          ...prev,
+          logs: mergedWalks,
+          goals: finalGoals,
+          preferences: {
+            ...prev.preferences,
+            ...finalPref,
+            lastSyncDate: new Date().toISOString()
+          }
+        };
+      });
 
       setIsSyncing(false);
       return { success: true };
@@ -436,6 +445,97 @@ const App: React.FC = () => {
     }
   };
 
+  const syncWithHealthConnect = async () => {
+    if (!state.preferences.healthConnectSync) return;
+
+    const isAvailable = await isHealthConnectAvailable();
+    if (!isAvailable) return;
+
+    setIsHealthSyncing(true);
+    try {
+      console.log('Starting Health Connect synchronization...');
+      const sinceDate = state.preferences.healthConnectSyncDate;
+      const recentWalks = await fetchRecentWalksAndHikes(sinceDate);
+
+      if (recentWalks.length === 0) {
+        console.log('No new walks/hikes found in Health Connect.');
+        return;
+      }
+
+      let updatedState: AppState | null = null;
+
+      setState(prev => {
+        const logsMap = new Map<string, WalkLog>(prev.logs.map(log => [log.id, log]));
+        let newLogsAdded = 0;
+        const deletedIds = prev.deletedHealthConnectIds || [];
+
+        recentWalks.forEach(newLog => {
+          if (deletedIds.includes(newLog.id)) {
+            // Skip this log because the user explicitly deleted it from StrideTrack
+            return;
+          }
+          if (!logsMap.has(newLog.id)) {
+            logsMap.set(newLog.id, newLog);
+            newLogsAdded++;
+          } else {
+            const existing = logsMap.get(newLog.id)!;
+            logsMap.set(newLog.id, {
+              ...existing,
+              ...newLog,
+              title: existing.title !== 'New Walk' && existing.title !== 'Walking' && existing.title !== 'Hiking' ? existing.title : newLog.title,
+            });
+          }
+        });
+
+        console.log(`Health Connect: Merged. Added ${newLogsAdded} new walks/hikes.`);
+
+        const mergedLogs = Array.from(logsMap.values()).sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        const newState = {
+          ...prev,
+          logs: mergedLogs,
+          preferences: {
+            ...prev.preferences,
+            lastSyncDate: new Date().toISOString()
+          }
+        };
+
+        updatedState = newState;
+        return newState;
+      });
+
+      // If user is logged in to Supabase, automatically push the newly synced walks to the cloud!
+      if (user && updatedState) {
+        await syncData(user, updatedState);
+      }
+    } catch (e) {
+      console.error('Failed to sync with Health Connect:', e);
+    } finally {
+      setIsHealthSyncing(false);
+    }
+  };
+
+  // Automatic Health Connect sync on app load, visibility change, or preference change
+  useEffect(() => {
+    if (state.preferences.healthConnectSync) {
+      syncWithHealthConnect();
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && state.preferences.healthConnectSync) {
+        console.log('App brought to foreground, triggering Health Connect sync...');
+        syncWithHealthConnect();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [state.preferences.healthConnectSync]);
+
   const handleAddWalk = async (distance: number, dateString?: string) => {
     let logDate = new Date().toISOString();
 
@@ -485,7 +585,10 @@ const App: React.FC = () => {
   const handleDeleteLog = async (id: string) => {
     setState(prev => ({
       ...prev,
-      logs: prev.logs.filter(log => log.id !== id)
+      logs: prev.logs.filter(log => log.id !== id),
+      deletedHealthConnectIds: id.startsWith('hc_')
+        ? [...(prev.deletedHealthConnectIds || []), id]
+        : prev.deletedHealthConnectIds
     }));
 
     if (user) {

@@ -1,7 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { UserPreferences } from '../types';
-import { User, MapPin, Calendar, Bell, Moon, Sun, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock } from 'lucide-react';
+import { User, MapPin, Calendar, Bell, Moon, Sun, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { Capacitor } from '@capacitor/core';
+import { requestHealthConnectPermissions } from '../utils/healthConnect';
+import { Health } from '@capgo/capacitor-health';
 
 interface SettingsProps {
   preferences: UserPreferences;
@@ -67,6 +70,7 @@ const Settings: React.FC<SettingsProps> = ({
   const [showHelp, setShowHelp] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showHealthHelp, setShowHealthHelp] = useState(false);
 
   // Authentication State
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -85,6 +89,52 @@ const Settings: React.FC<SettingsProps> = ({
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
   const [changePasswordSuccess, setChangePasswordSuccess] = useState<string | null>(null);
+
+  const isNative = Capacitor.isNativePlatform();
+
+  const handleToggleHealthConnect = async () => {
+    if (preferences.healthConnectSync) {
+      if (window.confirm("Are you sure you want to disable Health Connect sync? This will stop automatic importing of walks.")) {
+        onUpdatePreferences({ healthConnectSync: false });
+      }
+    } else {
+      const success = await requestHealthConnectPermissions();
+      if (success) {
+        // Ask the user if they want to import past history or only sync from now on
+        const importHistory = window.confirm(
+          "Would you like to import your past walk and hike history from Health Connect?\n\n" +
+          "• Click OK to import your activities from the past 30 days.\n" +
+          "• Click Cancel to only sync new activities from this moment forward."
+        );
+
+        const syncDate = importHistory 
+          ? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() // Past 30 days
+          : new Date().toISOString(); // From now on
+
+        onUpdatePreferences({ 
+          healthConnectSync: true,
+          healthConnectSyncDate: syncDate
+        });
+        
+        if (importHistory) {
+          alert("Google Health Connect sync enabled! We will import walks from the past 30 days shortly.");
+        } else {
+          alert("Google Health Connect sync enabled! Only walks completed from this moment forward will be synced.");
+        }
+      } else {
+        alert("Could not enable sync. Please ensure Google Health Connect is installed on your device and permissions are granted.");
+      }
+    }
+  };
+
+  const handleOpenHealthConnectSettings = async () => {
+    try {
+      await Health.openHealthConnectSettings();
+    } catch (e) {
+      console.error("Could not open Health Connect settings", e);
+      alert("Could not open Health Connect settings. Please open them manually via your phone's Settings app.");
+    }
+  };
 
   const handleAuthAction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -300,6 +350,68 @@ const Settings: React.FC<SettingsProps> = ({
           </div>
         </div>
 
+        {/* Integrations */}
+        <div>
+          <h3 className="text-lg font-black uppercase mb-4 bg-black text-white inline-block px-3 py-1 shadow-none">Integrations</h3>
+          <div className="bg-white border-[3px] border-black shadow-hard p-4 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-emerald-200 border-[3px] border-black w-10 h-10 flex items-center justify-center shadow-none flex-shrink-0">
+                  <Activity size={20} className="text-black" strokeWidth={2.5} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-black text-sm">Health Connect</span>
+                  <span className="text-[10px] text-black/60 font-bold uppercase tracking-wider leading-none mt-0.5">
+                    Sync Garmin, Samsung & more
+                  </span>
+                </div>
+              </div>
+              <div>
+                <button
+                  onClick={handleToggleHealthConnect}
+                  className={`border-[3px] border-black px-4 py-1.5 font-black text-xs uppercase shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-0 transition-all text-black ${preferences.healthConnectSync ? 'bg-accent-pink' : 'bg-white'}`}
+                >
+                  {preferences.healthConnectSync ? 'Connected' : 'Connect'}
+                </button>
+              </div>
+            </div>
+            {!isNative && (
+              <p className="text-[10px] text-red-600 font-bold uppercase leading-tight bg-red-50 border-[2px] border-red-300 p-2">
+                Note: Health Connect sync is only available on native Android devices.
+              </p>
+            )}
+            {isNative && (
+              <div className="flex flex-col gap-2">
+                {preferences.healthConnectSync ? (
+                  <p className="text-[10px] text-green-700 font-bold uppercase leading-tight bg-green-50 border-[2px] border-green-300 p-2">
+                    Active: Walks and hikes are automatically imported from your device.
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-black/60 font-bold uppercase leading-tight bg-gray-50 border-[2px] border-black/20 p-2">
+                    Connect your device to automatically sync walks from your smartwatch!
+                  </p>
+                )}
+                <div className="flex items-center gap-2">
+                  {preferences.healthConnectSync && (
+                    <button
+                      onClick={handleOpenHealthConnectSettings}
+                      className="bg-white hover:bg-gray-50 border-[3px] border-black px-2.5 py-1.5 font-black text-[10px] uppercase shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-0 transition-all text-black"
+                    >
+                      Adjust Permissions
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowHealthHelp(true)}
+                    className="bg-teal-100 hover:bg-teal-200 border-[3px] border-black px-2.5 py-1.5 font-black text-[10px] uppercase shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-0 transition-all text-black"
+                  >
+                    Connection Guide
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Integrations & Cloud Sync */}
         <div>
           <h3 className="text-lg font-black uppercase mb-4 bg-black text-white inline-block px-3 py-1 shadow-none">Cloud Sync</h3>
@@ -484,7 +596,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.2.1</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.3.0</span>
             </div>
           </div>
         </div>
@@ -529,6 +641,72 @@ const Settings: React.FC<SettingsProps> = ({
             <h3 className="font-black uppercase mb-1">Cloud Sync</h3>
             <p>Connect your profile under Cloud Sync to automatically secure all your walks, goals, and settings. Logging in on any device instantly restores your history!</p>
           </div>
+          <div className="pt-3 border-t-2 border-black/10">
+            <h3 className="font-black uppercase mb-1 text-teal-700">Health Connect</h3>
+            <p className="mb-3">Automatically import walking and hiking sessions from Garmin, Samsung, Fitbit, and more.</p>
+            <button
+              onClick={() => {
+                setShowHelp(false);
+                setShowHealthHelp(true);
+              }}
+              className="w-full bg-teal-100 hover:bg-teal-200 border-[3px] border-black py-2 font-black uppercase text-xs text-black shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-0 transition-all"
+            >
+              View Connection Guide
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showHealthHelp}
+        onClose={() => setShowHealthHelp(false)}
+        title="Health Guide"
+        icon={<Activity size={24} className="text-black" strokeWidth={2.5} />}
+      >
+        <div className="space-y-5 text-black">
+          <div className="bg-teal-50 border-[3px] border-black p-3 shadow-none">
+            <p className="font-bold text-xs uppercase text-teal-800 leading-tight">
+              StrideTrack can automatically sync your walk and hike activities from your smartwatch (Garmin, Samsung, Fitbit, etc.) using Google Health Connect.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-black uppercase tracking-tight text-xs bg-black text-white px-2 py-0.5 inline-block">
+              1. Link your Smartwatch App
+            </h4>
+            <ul className="list-decimal pl-4 space-y-1.5 font-bold text-xs leading-normal">
+              <li>Ensure <strong>Google Health Connect</strong> is installed on your phone (usually built into Android settings under Security & Privacy &rarr; Privacy).</li>
+              <li>Open your smartwatch app (e.g., <strong>Garmin Connect</strong>, Samsung Health, or Fitbit).</li>
+              <li>Go to settings, locate <strong>Connected Apps</strong>, <strong>Partner Apps</strong>, or <strong>Integrations</strong>.</li>
+              <li>Enable integration with <strong>Health Connect</strong> and allow it to export your workouts/activities.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-black uppercase tracking-tight text-xs bg-black text-white px-2 py-0.5 inline-block">
+              2. Enable Sync in StrideTrack
+            </h4>
+            <ul className="list-decimal pl-4 space-y-1.5 font-bold text-xs leading-normal">
+              <li>Tap the <strong>Connect</strong> button under StrideTrack Settings &rarr; Integrations.</li>
+              <li>A system dialog will request permissions.</li>
+              <li>To import activities, you must toggle on <strong>Exercise (Workouts)</strong> and <strong>Distance</strong>.</li>
+              <li><em>Optional:</em> Toggle on <strong>Steps</strong> and <strong>Active Calories Burned</strong>. If steps are off, we estimate them from distance; if calories are off, we hide calorie counts gracefully.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-black uppercase tracking-tight text-xs bg-black text-white px-2 py-0.5 inline-block">
+              3. Changing Permissions Later
+            </h4>
+            <p className="font-bold text-xs leading-normal">
+              If you want to change your permissions or revoke access later:
+            </p>
+            <ul className="list-disc pl-4 space-y-1.5 font-bold text-xs leading-normal">
+              <li>Go to StrideTrack Settings &rarr; Integrations and tap <strong>Adjust Permissions</strong>. This takes you directly to the system settings page for StrideTrack.</li>
+              <li>Alternatively, go to your phone's native settings: <strong>Settings &rarr; Security & Privacy &rarr; Privacy &rarr; Health Connect &rarr; App permissions &rarr; StrideTrack</strong>.</li>
+              <li>Toggle individual permissions ON/OFF or turn off all sync completely.</li>
+            </ul>
+          </div>
         </div>
       </Modal>
 
@@ -539,7 +717,6 @@ const Settings: React.FC<SettingsProps> = ({
         icon={<Rocket size={24} className="text-black" strokeWidth={2.5} />}
       >
         <ul className="list-disc pl-5 space-y-2">
-          <li>Google Health Connect Integration</li>
           <li>Achievements & Badges</li>
           <li>Dark Mode (The Real One)</li>
         </ul>
