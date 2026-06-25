@@ -47,9 +47,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     
     <!-- Health Connect Read Permissions -->
-    <uses-permission android:name="android.permission.health.READ_STEPS"/>
     <uses-permission android:name="android.permission.health.READ_DISTANCE"/>
-    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED"/>
     <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
 
     <!-- Visibility queries for Health Connect package -->

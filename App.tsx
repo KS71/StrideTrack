@@ -288,7 +288,6 @@ const App: React.FC = () => {
             distance: lw.distance,
             duration: lw.duration,
             title: lw.title,
-            steps: lw.steps,
             intensity: lw.intensity
           });
         }
@@ -354,7 +353,6 @@ const App: React.FC = () => {
               distance: Number(rw.distance),
               duration: rw.duration,
               title: rw.title,
-              steps: rw.steps || undefined,
               intensity: (rw.intensity as any) || undefined
             });
             hasChanges = true;
@@ -555,8 +553,7 @@ const App: React.FC = () => {
       date: logDate,
       distance,
       duration: '0m 0s',
-      title: 'New Walk',
-      steps: Math.floor(distance * 1312)
+      title: 'New Walk'
     };
 
     setState(prev => ({
@@ -573,8 +570,7 @@ const App: React.FC = () => {
           date: newLog.date,
           distance: newLog.distance,
           duration: newLog.duration,
-          title: newLog.title,
-          steps: newLog.steps
+          title: newLog.title
         });
       } catch (e) {
         console.error("Failed to sync new walk log to Supabase in background", e);
@@ -598,6 +594,34 @@ const App: React.FC = () => {
         console.error("Failed to delete walk from Supabase in background", e);
       }
     }
+  };
+
+  const handleResetAllData = async () => {
+    // First warning
+    const first = window.confirm(
+      "⚠️ Delete All Data?\n\nThis will permanently erase all your walks, goals, and settings from this device.\n\nThis cannot be undone. Are you sure you want to continue?"
+    );
+    if (!first) return;
+
+    // Second warning – extra confirmation
+    const second = window.confirm(
+      "🚨 FINAL WARNING\n\nYou are about to permanently delete ALL your walking history and goals.\n\nThere is no way to recover this data unless you have a backup file.\n\nPress OK to delete everything now."
+    );
+    if (!second) return;
+
+    // Sign out of Supabase if logged in (cloud data stays, only local is cleared)
+    if (user) {
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.error("Failed to sign out during reset", e);
+      }
+    }
+
+    // Clear localStorage and reset state
+    localStorage.removeItem(STORAGE_KEY);
+    setState(INITIAL_STATE);
+    changeView('dashboard');
   };
 
   const handleUpdateGoal = async (period: Period, distance: number) => {
@@ -831,6 +855,7 @@ const App: React.FC = () => {
                     user={user}
                     isSyncing={isSyncing}
                     onSync={syncData}
+                    onResetAllData={handleResetAllData}
                   />
                 )}
               </motion.div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Goals, Period, View } from '../types';
 import { toDisplayDistance, toStorageDistance, getUnitLabel } from '../utils';
-import { ArrowLeft, Check, Footprints, Target, Flag, Settings } from 'lucide-react';
+import { ArrowLeft, Check, Target, Flag, Settings } from 'lucide-react';
 import Navigation from './Navigation';
 
 interface GoalSetupProps {
@@ -57,9 +57,7 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
   const daysInPeriod = period === 'week' ? 7 : period === 'month' ? 30 : 365;
   const daily = target / daysInPeriod;
   const targetInKm = toStorageDistance(target, units);
-  const steps = Math.floor((targetInKm / daysInPeriod) * 1312);
   const unitLabel = getUnitLabel(units);
-  const dailySteps = steps;
 
   return (
     <div className="flex flex-col min-h-full bg-background-light font-display pb-4">
@@ -156,11 +154,7 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
                 <span className="text-xl font-black">{daily.toFixed(2)}</span>
                 <span className="font-bold text-[10px]">{unitLabel} / day</span>
               </div>
-              <div className="text-[9px] font-medium mt-0 opacity-75">
-                ~{dailySteps.toLocaleString()} steps
-              </div>
             </div>
-            <Footprints className="text-black/10 w-8 h-8 absolute -right-1 -bottom-1 -rotate-12" />
           </div>
         </div>
 

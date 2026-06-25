@@ -43,7 +43,7 @@ export const requestHealthConnectPermissions = async (): Promise<boolean> => {
 
     // Requesting read permissions for required data types (workouts is plural in the library definitions)
     await Health.requestAuthorization({
-      read: ['steps', 'distance', 'calories', 'workouts']
+      read: ['distance', 'workouts']
     });
     return true;
   } catch (e) {
@@ -104,8 +104,6 @@ export const fetchRecentWalksAndHikes = async (sinceIsoString?: string): Promise
         distance: parseFloat(distanceInKm.toFixed(2)),
         duration: formatDuration(workout.duration || 0),
         title: capitalizedTitle,
-        steps: Math.floor(distanceInKm * 1312), // Estimate steps using the same standard multiplier as manual logs
-        calories: workout.totalEnergyBurned ? Math.round(workout.totalEnergyBurned) : undefined,
         source: workout.sourceName || 'Health Connect'
       };
     });

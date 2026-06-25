@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { UserPreferences } from '../types';
-import { User, MapPin, Calendar, Bell, Moon, Sun, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity } from 'lucide-react';
+import { User, MapPin, Calendar, Bell, Moon, Sun, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity, Globe } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { Capacitor } from '@capacitor/core';
 import { requestHealthConnectPermissions } from '../utils/healthConnect';
@@ -16,6 +16,7 @@ interface SettingsProps {
   user: any;
   isSyncing: boolean;
   onSync: (user: any, currentState?: any) => Promise<any>;
+  onResetAllData: () => void;
 }
 
 interface ModalProps {
@@ -64,7 +65,8 @@ const Settings: React.FC<SettingsProps> = ({
   onBack,
   user,
   isSyncing,
-  onSync
+  onSync,
+  onResetAllData
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showHelp, setShowHelp] = useState(false);
@@ -543,6 +545,28 @@ const Settings: React.FC<SettingsProps> = ({
           </div>
         </div>
 
+        {/* Danger Zone */}
+        <div>
+          <h3 className="text-lg font-black uppercase mb-4 bg-red-600 text-white inline-block px-3 py-1 shadow-none">Danger Zone</h3>
+          <div className="bg-white border-[3px] border-red-600 shadow-[5px_5px_0px_0px_#dc2626] p-4 flex flex-col gap-3">
+            <div className="flex items-start gap-3">
+              <div className="bg-red-100 border-[3px] border-red-600 w-10 h-10 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">🗑️</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-black text-black text-sm">Delete All Local Data</span>
+                <span className="text-[10px] font-bold text-red-700 uppercase tracking-wider mt-0.5">Permanently erases all walks, goals &amp; settings</span>
+              </div>
+            </div>
+            <button
+              onClick={onResetAllData}
+              className="w-full bg-red-600 border-[3px] border-black shadow-hard py-3 font-black uppercase text-sm text-white hover:bg-red-700 hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
+            >
+              🗑️ Delete All Data
+            </button>
+          </div>
+        </div>
+
         {/* Support */}
         <div>
           <h3 className="text-lg font-black uppercase mb-4 bg-black text-white inline-block px-3 py-1 shadow-none">Support</h3>
@@ -589,6 +613,22 @@ const Settings: React.FC<SettingsProps> = ({
               <ChevronRight size={20} className="text-black" strokeWidth={2.5} />
             </button>
 
+            <button
+              onClick={() => window.open('https://stridetrack.fit', '_blank')}
+              className="w-full bg-white border-[3px] border-black shadow-hard p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="bg-lime-200 border-[3px] border-black w-10 h-10 flex items-center justify-center shadow-none flex-shrink-0">
+                  <Globe size={20} className="text-black" strokeWidth={2.5} />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="font-bold text-black">Visit Website</span>
+                  <span className="text-xs font-bold opacity-60 text-black text-left">stridetrack.fit</span>
+                </div>
+              </div>
+              <ChevronRight size={20} className="text-black" strokeWidth={2.5} />
+            </button>
+
             <div className="bg-white border-[3px] border-black shadow-hard p-4 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="bg-gray-200 border-[3px] border-black w-10 h-10 flex items-center justify-center shadow-none flex-shrink-0">
@@ -596,7 +636,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.3.0</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.3.1</span>
             </div>
           </div>
         </div>

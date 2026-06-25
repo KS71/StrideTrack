@@ -90,6 +90,12 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.3.1:**
+- **Danger Zone / Delete All Data:** Added a secure option in Settings to permanently delete all local walks, goals, and settings with dual confirmation prompts.
+- **Official Website Link:** Added a direct "Visit Website" link to [stridetrack.fit](https://stridetrack.fit) under the Settings Support section.
+- **Streamlined Health Connect Permissions:** Optimized read permissions by removing step and calorie tracking from Health Connect integration to focus purely on high-fidelity distance and workouts, reducing permission overhead.
+- **Removed Goal Step Estimates:** Simplified goal setup and walks by tracking pure distance, removing estimated step counts.
+
 **v2.3.0:**
 - **Google Health Connect Integration:** Automatically sync walks and hikes directly from smartwatches (Garmin, Samsung, Fitbit) and companion apps.
 - **Selective Source Filtering (No Double-Counting):** Prioritizes GPS smartwatch distance over phone background step sensors to prevent double-counting.

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StrideTrack – Make Every Step Count</title>
+  <meta name="description" content="StrideTrack is a beautiful Neo-Brutalist Android app to track your walking goals week by week, month by month, year by year. Log walks, track consistency, and back up your data." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ========== NAV ========== -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <span class="logo-icon">🚶</span>
+        <span class="logo-text">StrideTrack</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#data">Your Data</a>
+        <a href="#download">Download</a>
+      </div>
+      <a href="#download" class="btn btn-primary btn-sm nav-cta">Get the App</a>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section id="hero">
+    <div class="hero-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <div class="hero-badge">🚀 v2.3.1 — Now with Health Connect</div>
+        <h1>Make Every<br /><span class="highlight-yellow">Step</span> Count.</h1>
+        <p class="hero-sub">The boldest way to track your walking goals.<br />Week by week. Month by month. Year by year.</p>
+        <div class="hero-btns">
+          <a href="https://github.com/KS71/WalkGoal/releases" target="_blank" rel="noopener" class="btn btn-primary btn-lg" id="btn-github">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            Download from GitHub
+          </a>
+          <a href="#" class="btn btn-outline btn-lg" id="btn-play" title="Coming soon to Google Play">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-1.303a1 1 0 0 1 0 1.192L15.86 14.44l-2.44-2.44 2.44-2.44 1.838 1.844zM5.864 3.658L16.8 9.99l-2.302 2.302-8.635-8.634z"/></svg>
+            Google Play <span class="badge-soon">Soon</span>
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-pill">
+            <span class="stat-num">500+</span>
+            <span class="stat-label">km logged</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num">100%</span>
+            <span class="stat-label">offline-first</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num">v2.3.1</span>
+            <span class="stat-label">latest release</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-phones">
+        <div class="phone phone-back">
+          <div class="phone-screen phone-screen-back">
+            <img src="003.jpg" alt="StrideTrack Log Walk screen" />
+          </div>
+        </div>
+        <div class="phone phone-front">
+          <div class="phone-screen phone-screen-front">
+            <img src="001.jpg" alt="StrideTrack Dashboard" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-marquee-wrap">
+      <div class="marquee">
+        <span>Track your walks &nbsp;✦&nbsp; Set weekly goals &nbsp;✦&nbsp; Beat yesterday &nbsp;✦&nbsp; Consistency heatmap &nbsp;✦&nbsp; Cloud backup &nbsp;✦&nbsp; Health Connect sync &nbsp;✦&nbsp; 100% your data &nbsp;✦&nbsp;</span>
+        <span aria-hidden="true">Track your walks &nbsp;✦&nbsp; Set weekly goals &nbsp;✦&nbsp; Beat yesterday &nbsp;✦&nbsp; Consistency heatmap &nbsp;✦&nbsp; Cloud backup &nbsp;✦&nbsp; Health Connect sync &nbsp;✦&nbsp; 100% your data &nbsp;✦&nbsp;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FEATURES ========== -->
+  <section id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">WHY STRIDETRACK?</div>
+        <h2>Everything you need.<br />Nothing you don't.</h2>
+      </div>
+
+      <div class="features-grid">
+
+        <div class="feature-card card-yellow feature-large">
+          <div class="feature-icon">📊</div>
+          <h3>Live Dashboard</h3>
+          <p>See exactly where you stand – ahead or behind your goal. The bento-grid dashboard shows your weekly progress, daily target, and how many km you have left to go. At a glance.</p>
+          <div class="feature-img-wrap">
+            <img src="001.jpg" alt="StrideTrack Dashboard" class="feature-img" />
+          </div>
+        </div>
+
+        <div class="features-col-right">
+          <div class="feature-card card-pink">
+            <div class="feature-icon">🎯</div>
+            <h3>Set Your Targets</h3>
+            <p>Set goals for the week, the month, and the year. The app tells you exactly how many km per day you need to hit them.</p>
+            <div class="feature-img-wrap feature-img-wrap-sm">
+              <img src="004.jpg" alt="StrideTrack Goal Setup" class="feature-img" />
+            </div>
+          </div>
+          <div class="feature-card card-teal">
+            <div class="feature-icon">📅</div>
+            <h3>Consistency Heatmap</h3>
+            <p>Build your streak. Watch the calendar fill up with teal tiles – every active day adds to your momentum.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="features-row-2">
+
+        <div class="feature-card card-white">
+          <div class="feature-icon">📝</div>
+          <h3>Log a Walk in Seconds</h3>
+          <p>No bloat. Just type your distance, pick the date, tap <strong>Add to Goal</strong>. Done.</p>
+          <div class="feature-img-wrap feature-img-wrap-sm">
+            <img src="003.jpg" alt="Log Walk screen" class="feature-img" />
+          </div>
+        </div>
+
+        <div class="feature-card card-white">
+          <div class="feature-icon">📈</div>
+          <h3>Full History</h3>
+          <p>Every walk ever logged, grouped by month. Monthly headers turn green when you hit your goal for that month.</p>
+          <div class="feature-img-wrap feature-img-wrap-sm">
+            <img src="ny_history.jpg" alt="History screen" class="feature-img" />
+          </div>
+        </div>
+
+        <div class="feature-card card-white">
+          <div class="feature-icon">⚙️</div>
+          <h3>Your Preferences</h3>
+          <p>Kilometres or miles. Week starts Monday or Sunday. 12h or 24h clock. StrideTrack adapts to you.</p>
+          <div class="feature-img-wrap feature-img-wrap-sm">
+            <img src="ny_settings.jpg" alt="Settings screen" class="feature-img" />
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== HEALTH CONNECT ========== -->
+  <section id="health-connect">
+    <div class="container hc-inner">
+      <div class="hc-text">
+        <div class="section-label">NEW IN V2.3</div>
+        <h2>Sync from your<br /><span class="highlight-pink">smartwatch.</span></h2>
+        <p>StrideTrack integrates directly with <strong>Google Health Connect</strong>. If your Garmin, Samsung Galaxy Watch, or Fitbit has already recorded a session, StrideTrack can pull it straight in – no typing required.</p>
+        <ul class="hc-list">
+          <li>
+            <span class="hc-icon">⌚</span>
+            <div>
+              <strong>Garmin, Samsung & Fitbit</strong>
+              <span>Pull GPS distance directly from your smartwatch via Health Connect</span>
+            </div>
+          </li>
+          <li>
+            <span class="hc-icon">🔢</span>
+            <div>
+              <strong>No Double-Counting</strong>
+              <span>GPS distance from your watch is always prioritised over phone-based sensor data</span>
+            </div>
+          </li>
+          <li>
+            <span class="hc-icon">🧹</span>
+            <div>
+              <strong>Smart De-duplication</strong>
+              <span>Deleted sessions won't re-appear on next sync</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="hc-visual">
+        <div class="hc-card hc-card-top">
+          <div class="hc-card-icon">⌚</div>
+          <div>
+            <div class="hc-card-title">Garmin Forerunner</div>
+            <div class="hc-card-sub">Morning Run – 8.4 km</div>
+          </div>
+          <div class="hc-card-status synced">Synced ✓</div>
+        </div>
+        <div class="hc-arrow">↓</div>
+        <div class="hc-card hc-card-mid">
+          <div class="hc-card-icon">💚</div>
+          <div>
+            <div class="hc-card-title">Google Health Connect</div>
+            <div class="hc-card-sub">Walking & Hiking data</div>
+          </div>
+        </div>
+        <div class="hc-arrow">↓</div>
+        <div class="hc-card hc-card-bot card-yellow">
+          <div class="hc-card-icon">🚶</div>
+          <div>
+            <div class="hc-card-title">StrideTrack</div>
+            <div class="hc-card-sub">Weekly goal: 12.49 / 25 km</div>
+          </div>
+          <div class="hc-card-status ahead">Ahead 🔥</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DATA & BACKUP ========== -->
+  <section id="data">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label">YOUR DATA, YOUR RULES</div>
+        <h2>Three ways to keep<br />your history <span class="highlight-teal">safe.</span></h2>
+        <p class="section-sub">StrideTrack is local-first by default. Your data lives on your phone – we never see it unless you want us to.</p>
+      </div>
+
+      <div class="data-cards">
+
+        <div class="data-card">
+          <div class="data-card-num">01</div>
+          <div class="data-card-icon" style="background: var(--yellow);">📱</div>
+          <h3>Local Storage</h3>
+          <p>By default, every walk is saved directly on your phone. No account needed. Works 100% offline. Your data never leaves your device.</p>
+          <div class="data-tag">Default – always on</div>
+        </div>
+
+        <div class="data-card">
+          <div class="data-card-num">02</div>
+          <div class="data-card-icon" style="background: var(--pink);">💾</div>
+          <h3>Local Backup File</h3>
+          <p>Don't want the cloud? Export your entire walking history as a JSON backup file at any time. Restore it just as easily. Your phone, your archive.</p>
+          <div class="data-tag">Opt-in · No account</div>
+        </div>
+
+        <div class="data-card data-card-featured">
+          <div class="data-card-num">03</div>
+          <div class="data-card-icon" style="background: var(--teal); color: #fff;">☁️</div>
+          <h3>Cloud Sync via Supabase</h3>
+          <p>Connect a profile and your walks are automatically backed up in the cloud. Protected by PostgreSQL Row-Level Security – only your account can ever read your data.</p>
+          <div class="data-tag data-tag-teal">Opt-in · Encrypted</div>
+          <div class="supabase-badge">
+            <span>Powered by</span>
+            <strong>Supabase</strong>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="privacy-banner">
+        <span class="privacy-icon">🔒</span>
+        <p>StrideTrack never sells your data. Ever. Cloud sync is completely optional and protected by database-level Row-Level Security (RLS). You can delete your account and all its data at any time from within the app.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== DOWNLOAD ========== -->
+  <section id="download">
+    <div class="container download-inner">
+      <div class="section-label center">GET THE APP</div>
+      <h2 class="center">Ready to start<br />your <span class="highlight-yellow">streak?</span></h2>
+      <p class="section-sub center">Download StrideTrack free for Android. No subscription. No ads. Just walking.</p>
+
+      <div class="download-cards">
+
+        <div class="download-card download-card-github">
+          <div class="dl-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </div>
+          <div class="dl-info">
+            <div class="dl-platform">Available now</div>
+            <div class="dl-store">Download on GitHub</div>
+            <div class="dl-desc">Get the latest APK from the releases page</div>
+          </div>
+          <a href="https://github.com/KS71/WalkGoal/releases" target="_blank" rel="noopener" class="btn btn-primary btn-lg" id="btn-github-dl">
+            Download APK →
+          </a>
+        </div>
+
+        <div class="download-card download-card-play">
+          <div class="dl-icon dl-icon-play">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-1.303a1 1 0 0 1 0 1.192L15.86 14.44l-2.44-2.44 2.44-2.44 1.838 1.844zM5.864 3.658L16.8 9.99l-2.302 2.302-8.635-8.634z"/></svg>
+          </div>
+          <div class="dl-info">
+            <div class="dl-platform">Coming soon</div>
+            <div class="dl-store">Google Play Store</div>
+            <div class="dl-desc">Full Play Store release coming soon</div>
+          </div>
+          <button class="btn btn-outline btn-lg" disabled id="btn-play-dl">
+            Coming Soon
+          </button>
+        </div>
+
+      </div>
+
+      <div class="install-steps">
+        <h3>Installing the APK from GitHub</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <p>Download the <code>.apk</code> file from the GitHub releases page</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <p>Open the file on your Android phone and allow installation from unknown sources if prompted</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <p>Tap <strong>Install</strong> and open StrideTrack. Start walking! 🚶</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer id="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <span class="logo-icon">🚶</span>
+          <span class="logo-text">StrideTrack</span>
+        </div>
+        <p>Built for walkers who mean business.<br />100% vibe-coded. 100% yours.</p>
+        <div class="footer-version">v2.3.1</div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <div class="footer-col-title">App</div>
+          <a href="#features">Features</a>
+          <a href="#health-connect">Health Connect</a>
+          <a href="#data">Data & Privacy</a>
+          <a href="#download">Download</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Links</div>
+          <a href="https://github.com/KS71/WalkGoal" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/KS71/WalkGoal/releases" target="_blank" rel="noopener">Releases</a>
+          <a href="https://github.com/KS71/WalkGoal/issues" target="_blank" rel="noopener">Report a Bug</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Legal</div>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="#">Support</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 StrideTrack. Open source under MIT License.</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
