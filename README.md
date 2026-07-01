@@ -93,6 +93,11 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.3.3:**
+- **New App Icon:** Refreshed the app with a brand new StrideTrack launcher icon and matching splash screen.
+- **Rebranding:** Renamed the app package to `com.stridetrack.app` to fully align with the StrideTrack brand.
+- **Cleaner Health Connect Permissions:** Removed all unused Health Connect permissions, keeping only distance and workout access.
+
 **v2.3.1:**
 - **Danger Zone / Delete All Data:** Added a secure option in Settings to permanently delete all local walks, goals, and settings with dual confirmation prompts.
 - **Official Website Link:** Added a direct "Visit Website" link to [stridetrack.fit](https://stridetrack.fit) under the Settings Support section.
