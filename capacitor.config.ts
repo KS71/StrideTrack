@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-    appId: 'com.walkgoal.app',
+    appId: 'com.stridetrack.app',
     appName: 'StrideTrack',
     webDir: 'dist'
 };

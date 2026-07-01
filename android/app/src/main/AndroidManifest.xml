@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,7 +18,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
+
             <!-- Intent filter for Supabase Deep Linking Password Reset -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -26,7 +26,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="stridetrack" />
             </intent-filter>
-            
+
             <!-- Intent filter for Google Health Connect Permissions Rationale -->
             <intent-filter>
                 <action android:name="androidx.health.platform.client.ACTION_SHOW_PERMISSIONS_RATIONALE" />
@@ -45,10 +45,53 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
-    
-    <!-- Health Connect Read Permissions -->
-    <uses-permission android:name="android.permission.health.READ_DISTANCE"/>
-    <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
+
+    <!-- Health Connect Read Permissions (only what the app actually uses) -->
+    <uses-permission android:name="android.permission.health.READ_DISTANCE" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE" />
+
+    <!-- Explicitly remove all unused Health Connect permissions added by the @capgo/capacitor-health library -->
+    <uses-permission android:name="android.permission.health.READ_STEPS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_STEPS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_WEIGHT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_WEIGHT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_SLEEP" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_RESPIRATORY_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_RESPIRATORY_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_OXYGEN_SATURATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_RESTING_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE_VARIABILITY" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE_VARIABILITY" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_VO2_MAX" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_VO2_MAX" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BLOOD_PRESSURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BLOOD_PRESSURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BODY_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BODY_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEIGHT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_HEIGHT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_FLOORS_CLIMBED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_FLOORS_CLIMBED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BODY_FAT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BODY_FAT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BASAL_BODY_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BASAL_BODY_TEMPERATURE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_BASAL_METABOLIC_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_TOTAL_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_MINDFULNESS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.WRITE_MINDFULNESS" tools:node="remove" />
 
     <!-- Visibility queries for Health Connect package -->
     <queries>
