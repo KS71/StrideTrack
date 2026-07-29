@@ -1,19 +1,22 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { AppState, WalkLog } from '../types';
 import { toDisplayDistance, getUnitLabel, getGoalForDate } from '../utils';
-import { Clock, Trash2, Footprints, Settings, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, Trash2, Footprints, Settings, MapPin, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
 
 interface HistoryProps {
   state: AppState;
   onDeleteLog?: (id: string) => void;
+  onEditLog?: (log: WalkLog) => void;
   setView: (view: any) => void;
   units: 'km' | 'mi';
   timeFormat: '12h' | '24h';
 }
 
-const HistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLast: boolean; units: 'km' | 'mi'; index: number; timeFormat: '12h' | '24h' }> = ({ log, onDelete, isLast, units, index, timeFormat }) => {
+const HistoryItem: React.FC<{ log: WalkLog; onEdit: (log: WalkLog) => void; onRequestDelete: (log: WalkLog) => void; isLast: boolean; units: 'km' | 'mi'; index: number; timeFormat: '12h' | '24h' }> = ({ log, onEdit, onRequestDelete, isLast, units, index, timeFormat }) => {
   const [isPressing, setIsPressing] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const longPressFired = useRef(false);
+  const moved = useRef(false);
 
   const date = new Date(log.date);
   const day = date.getDate();
@@ -36,22 +39,38 @@ const HistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLa
   const colors = ['bg-accent-pink', 'bg-primary', 'bg-teal-accent', 'bg-white'];
   const dateBoxColor = colors[index % colors.length];
 
-  const startPress = () => {
-    setIsPressing(true);
-    timerRef.current = setTimeout(() => {
-      setIsPressing(false);
-      if (window.confirm(`Delete this walk (${displayDistance} ${unitLabel.toLowerCase()}) from your history? It will also be deleted from the cloud sync.`)) {
-        onDelete(log.id);
-      }
-    }, 800); // 800ms hold time
-  };
-
-  const endPress = () => {
-    setIsPressing(false);
+  const clearTimer = () => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+  };
+
+  const startPress = () => {
+    moved.current = false;
+    longPressFired.current = false;
+    setIsPressing(true);
+    timerRef.current = setTimeout(() => {
+      // Held long enough → this is a delete request, not a tap
+      longPressFired.current = true;
+      setIsPressing(false);
+      onRequestDelete(log);
+    }, 800); // 800ms hold time
+  };
+
+  // Finger/mouse released: a quick release without moving = tap = edit
+  const handleRelease = () => {
+    setIsPressing(false);
+    clearTimer();
+    if (!longPressFired.current && !moved.current) {
+      onEdit(log);
+    }
+  };
+
+  // Scrolling or leaving the card cancels the gesture entirely (no edit, no delete)
+  const cancelPress = () => {
+    setIsPressing(false);
+    clearTimer();
   };
 
   const handleTouchStart = () => {
@@ -59,12 +78,12 @@ const HistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLa
   };
 
   const handleTouchEnd = () => {
-    endPress();
+    handleRelease();
   };
 
   const handleTouchMove = () => {
-    // If they scroll or move finger, cancel hold instantly
-    endPress();
+    moved.current = true;
+    cancelPress();
   };
 
   const handleMouseDown = () => {
@@ -72,11 +91,11 @@ const HistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLa
   };
 
   const handleMouseUp = () => {
-    endPress();
+    handleRelease();
   };
 
   const handleMouseLeave = () => {
-    endPress();
+    cancelPress();
   };
 
   const cardClass = isPressing
@@ -133,7 +152,10 @@ const HistoryItem: React.FC<{ log: WalkLog; onDelete: (id: string) => void; isLa
   );
 };
 
-const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, timeFormat }) => {
+const History: React.FC<HistoryProps> = ({ state, onDeleteLog, onEditLog, setView, units, timeFormat }) => {
+  // The walk queued for deletion — drives the confirmation modal (null = closed)
+  const [pendingDelete, setPendingDelete] = useState<WalkLog | null>(null);
+
   // Sort logs by date descending (Newest first)
   const sortedLogs = useMemo(() => {
     return [...state.logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -198,8 +220,8 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
                 {state.logs.length} sessions logged
               </p>
             </div>
-            <span className="text-[10px] uppercase font-black tracking-wider text-black/45 mt-0.5 animate-pulse">
-              💡 Tip: Hold a walk to delete it
+            <span className="text-[10px] uppercase font-black tracking-wider text-black/45 mt-0.5">
+              💡 Tip: Tap to edit · Hold to delete
             </span>
           </div>
           {/* Settings Button */}
@@ -269,7 +291,8 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
                         key={log.id}
                         log={log}
                         index={index}
-                        onDelete={onDeleteLog || (() => { })}
+                        onEdit={onEditLog || (() => { })}
+                        onRequestDelete={setPendingDelete}
                         isLast={index === logsInMonth.length - 1}
                         units={units}
                         timeFormat={timeFormat}
@@ -289,6 +312,60 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, setView, units, t
           </div>
         )}
       </section>
+
+      {/* Delete confirmation — neo-brutalist styled modal (replaces window.confirm) */}
+      {pendingDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50 animate-fade-in"
+          onClick={() => setPendingDelete(null)}
+        >
+          <div
+            className="w-full max-w-sm bg-background-light border-[4px] border-black shadow-hard-lg rounded-none"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header bar */}
+            <div className="bg-red-500 border-b-[4px] border-black px-5 py-3 flex items-center gap-3">
+              <div className="bg-white border-2 border-black p-1.5 shadow-hard-sm">
+                <Trash2 size={22} className="text-black" strokeWidth={2.5} />
+              </div>
+              <h2 className="text-lg font-black text-black uppercase tracking-wide">Delete Walk?</h2>
+            </div>
+
+            {/* Body */}
+            <div className="p-5">
+              <p className="font-bold text-black mb-2">
+                This walk will be permanently removed from your history.
+              </p>
+              <div className="inline-block bg-primary border-[3px] border-black px-3 py-1 shadow-hard-sm mb-4">
+                <span className="font-black text-black">
+                  {toDisplayDistance(pendingDelete.distance, units)} {getUnitLabel(units).toLowerCase()}
+                </span>
+              </div>
+              <p className="text-xs font-bold text-black/60 uppercase tracking-wider mb-5">
+                It will also be removed from cloud sync. This cannot be undone.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setPendingDelete(null)}
+                  className="flex-1 bg-white border-[3px] border-black shadow-hard rounded-none py-3 font-black text-black uppercase tracking-wide active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (onDeleteLog) onDeleteLog(pendingDelete.id);
+                    setPendingDelete(null);
+                  }}
+                  className="flex-1 bg-red-500 border-[3px] border-black shadow-hard rounded-none py-3 font-black text-black uppercase tracking-wide active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

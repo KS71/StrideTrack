@@ -48,6 +48,9 @@ const App: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isHealthSyncing, setIsHealthSyncing] = useState(false);
 
+  // The walk currently being edited (null = the Log screen is in "add new" mode)
+  const [editingLog, setEditingLog] = useState<WalkLog | null>(null);
+
   // Password Recovery Modal States
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [recoveryPassword, setRecoveryPassword] = useState('');
@@ -93,6 +96,10 @@ const App: React.FC = () => {
   };
 
   const changeView = (newView: View) => {
+    // Opening the Log screen through normal navigation (e.g. the "+" button)
+    // should always be a fresh "add new" form, never a lingering edit.
+    if (newView === 'log') setEditingLog(null);
+
     const mainViews: View[] = ['dashboard', 'history', 'log', 'goal-setup', 'yearly-overview'];
     const currentIndex = mainViews.indexOf(view);
     const newIndex = mainViews.indexOf(newView);
@@ -534,7 +541,7 @@ const App: React.FC = () => {
     };
   }, [state.preferences.healthConnectSync]);
 
-  const handleAddWalk = async (distance: number, dateString?: string) => {
+  const handleAddWalk = async (distance: number, dateString?: string, title?: string) => {
     let logDate = new Date().toISOString();
 
     if (dateString) {
@@ -548,12 +555,14 @@ const App: React.FC = () => {
       }
     }
 
+    const cleanTitle = title?.trim();
+
     const newLog: WalkLog = {
       id: generateId(),
       date: logDate,
       distance,
       duration: '0m 0s',
-      title: 'New Walk'
+      title: cleanTitle || 'New Walk'
     };
 
     setState(prev => ({
@@ -574,6 +583,47 @@ const App: React.FC = () => {
         });
       } catch (e) {
         console.error("Failed to sync new walk log to Supabase in background", e);
+      }
+    }
+  };
+
+  // Open the Log screen pre-filled with an existing walk so it can be edited
+  const handleEditLog = (log: WalkLog) => {
+    setEditingLog(log);
+    setDirection(0);
+    setView('log');
+  };
+
+  // Save changes to an existing walk (distance / date / title)
+  const handleUpdateWalk = async (distance: number, dateString?: string, title?: string) => {
+    if (!editingLog) return;
+    const id = editingLog.id;
+
+    let logDate = editingLog.date;
+    if (dateString) {
+      logDate = dateString.includes('T') ? dateString : new Date(dateString).toISOString();
+    }
+
+    const cleanTitle = title?.trim();
+    const finalTitle = cleanTitle || 'New Walk';
+
+    setState(prev => ({
+      ...prev,
+      logs: prev.logs.map(l =>
+        l.id === id ? { ...l, distance, date: logDate, title: finalTitle } : l
+      )
+    }));
+    setEditingLog(null);
+    changeView('history');
+
+    if (user) {
+      try {
+        await supabase.from('walks')
+          .update({ distance, date: logDate, title: finalTitle })
+          .eq('id', id)
+          .eq('user_id', user.id);
+      } catch (e) {
+        console.error("Failed to sync edited walk to Supabase in background", e);
       }
     }
   };
@@ -811,6 +861,7 @@ const App: React.FC = () => {
                   <History
                     state={state}
                     onDeleteLog={handleDeleteLog}
+                    onEditLog={handleEditLog}
                     setView={changeView}
                     units={state.preferences.units}
                     timeFormat={state.preferences.timeFormat || '24h'}
@@ -818,8 +869,10 @@ const App: React.FC = () => {
                 )}
                 {view === 'log' && (
                   <LogWalk
-                    onCancel={() => changeView('dashboard')}
-                    onSave={handleAddWalk}
+                    key={editingLog?.id || 'new'}
+                    editLog={editingLog}
+                    onCancel={() => changeView(editingLog ? 'history' : 'dashboard')}
+                    onSave={editingLog ? handleUpdateWalk : handleAddWalk}
                     units={state.preferences.units}
                     currentView={view}
                     onChangeView={changeView}

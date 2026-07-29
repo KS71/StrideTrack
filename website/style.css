@@ -162,6 +162,7 @@ img { display: block; max-width: 100%; }
   transition: color 0.15s;
 }
 .nav-links a:hover { color: var(--teal); text-decoration: underline; }
+.nav-links a.active { color: var(--teal); text-decoration: underline; }
 
 .nav-cta { margin-left: auto; }
 
@@ -892,6 +893,32 @@ img { display: block; max-width: 100%; }
 .fade-up.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ============================================
+   REDUCED MOTION
+   Respects the user's "reduce motion" system setting:
+   stop looping/entrance animations and show content immediately.
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee {
+    animation: none !important;
+  }
+
+  /* Ensure fade-in content is always visible, even before it scrolls in */
+  .fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* ============================================

@@ -93,6 +93,10 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.3.5:**
+- **Fixed Goal Input:** The distance goal field can now be cleared completely instead of leaving a stubborn "0" behind, which previously caused values like "010" when typing a new goal. Tapping the field also selects the current value so it can be overwritten directly.
+- **Save Confirmation:** Saving a goal now shows a clear "Goal saved" banner. Previously the confirmation was wiped instantly by a state refresh, making it look like nothing happened and prompting repeat taps.
+
 **v2.3.3:**
 - **New App Icon:** Refreshed the app with a brand new StrideTrack launcher icon and matching splash screen.
 - **Rebranding:** Renamed the app package to `com.stridetrack.app` to fully align with the StrideTrack brand.

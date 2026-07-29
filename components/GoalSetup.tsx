@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Goals, Period, View } from '../types';
 import { toDisplayDistance, toStorageDistance, getUnitLabel } from '../utils';
 import { ArrowLeft, Check, Target, Flag, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from './Navigation';
 
 interface GoalSetupProps {
@@ -16,20 +17,35 @@ interface GoalSetupProps {
 
 const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBack, onSave, units, currentView, onChangeView }) => {
   const [period, setPeriod] = useState<Period>(defaultPeriod);
-  const [target, setTarget] = useState<number>(0);
+  // Kept as a string so the field can be fully cleared (no stubborn leading "0")
+  const [targetText, setTargetText] = useState<string>('0');
   const [isSaved, setIsSaved] = useState(false);
 
-  // Sync state when period or unit changes
+  const target = parseFloat(targetText) || 0;
+
+  // Sync the field to the stored goal when the period or unit changes
   useEffect(() => {
     const rawGoal = currentGoals[period];
-    setTarget(toDisplayDistance(rawGoal, units));
-    setIsSaved(false);
+    setTargetText(String(toDisplayDistance(rawGoal, units)));
   }, [period, currentGoals, units]);
+
+  // Clearing the confirmation is deliberately NOT tied to currentGoals: saving
+  // changes that prop, which would otherwise wipe the "Saved!" state instantly.
+  useEffect(() => {
+    setIsSaved(false);
+  }, [period, units]);
 
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Auto-hide the confirmation banner so the screen doesn't stay stuck in "saved"
+  useEffect(() => {
+    if (!isSaved) return;
+    const timer = setTimeout(() => setIsSaved(false), 3000);
+    return () => clearTimeout(timer);
+  }, [isSaved]);
 
   const handleSave = () => {
     const storedDistance = toStorageDistance(target, units);
@@ -40,18 +56,12 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
 
   const handleIncrement = () => {
     setIsSaved(false);
-    setTarget(prev => {
-      const inc = units === 'mi' ? 1 : 1; // Increment by 1 unit
-      return Number((prev + inc).toFixed(2));
-    });
+    setTargetText(String(Number((target + 1).toFixed(2))));
   };
 
   const handleDecrement = () => {
     setIsSaved(false);
-    setTarget(prev => {
-      const dec = units === 'mi' ? 1 : 1;
-      return Math.max(0, Number((prev - dec).toFixed(2)));
-    });
+    setTargetText(String(Math.max(0, Number((target - 1).toFixed(2)))));
   };
 
   const daysInPeriod = period === 'week' ? 7 : period === 'month' ? 30 : 365;
@@ -117,11 +127,14 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
             <div className="flex flex-col items-center w-32">
               <input
                 type="number"
-                value={target}
+                inputMode="decimal"
+                value={targetText}
+                placeholder="0"
                 onChange={(e) => {
-                  setTarget(Number(e.target.value));
+                  setTargetText(e.target.value);
                   setIsSaved(false);
                 }}
+                onFocus={(e) => e.target.select()}
                 className="w-full text-center text-3xl font-black outline-none bg-transparent p-0 m-0"
               />
             </div>
@@ -157,6 +170,24 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
             </div>
           </div>
         </div>
+
+        {/* Save confirmation banner */}
+        <AnimatePresence>
+          {isSaved && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
+              className="bg-green-500 border-4 border-black shadow-hard-sm px-3 py-2 flex items-center gap-2"
+            >
+              <Check size={18} strokeWidth={3} className="text-black shrink-0" />
+              <span className="font-bold text-xs uppercase">
+                Goal saved: {target} {unitLabel} per {period}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Save Button - Inline */}
         <button

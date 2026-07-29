@@ -1,31 +1,44 @@
 import React, { useState, useRef } from 'react';
-import { View } from '../types';
-import { toStorageDistance, getUnitLabel } from '../utils';
-import { ChevronRight, Calendar, PlusCircle, Clock, Settings } from 'lucide-react';
+import { View, WalkLog } from '../types';
+import { toStorageDistance, toDisplayDistance, getUnitLabel } from '../utils';
+import { ChevronRight, Calendar, PlusCircle, Check, Clock, Settings, Tag } from 'lucide-react';
 import Navigation from './Navigation';
 
 interface LogWalkProps {
   onCancel: () => void;
-  onSave: (distance: number, date: string) => void;
+  onSave: (distance: number, date: string, title?: string) => void;
   units: 'km' | 'mi';
   currentView: View;
   onChangeView: (view: View) => void;
   timeFormat: '12h' | '24h';
+  editLog?: WalkLog | null;
 }
 
-const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView, onChangeView, timeFormat }) => {
-  const [distance, setDistance] = useState<string>('');
+// Titles the app assigns automatically — shown as a placeholder, not real text
+const GENERIC_TITLES = ['New Walk', 'Walk', 'Walking', 'Hiking'];
+
+const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView, onChangeView, timeFormat, editLog }) => {
+  const isEditing = !!editLog;
+
   const dateInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize with today's date in YYYY-MM-DD format for the input
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-  const [date, setDate] = useState<string>(todayStr);
+  // When editing, seed the form from the existing walk; otherwise start blank / now
+  const seedDate = editLog ? new Date(editLog.date) : new Date();
 
-  // Initialize time in HH:mm format
-  const nowTimeStr = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
-  const [time, setTime] = useState<string>(nowTimeStr);
+  const [distance, setDistance] = useState<string>(
+    editLog ? String(toDisplayDistance(editLog.distance, units)) : ''
+  );
+
+  const seedDateStr = `${seedDate.getFullYear()}-${String(seedDate.getMonth() + 1).padStart(2, '0')}-${String(seedDate.getDate()).padStart(2, '0')}`;
+  const [date, setDate] = useState<string>(seedDateStr);
+
+  const seedTimeStr = `${String(seedDate.getHours()).padStart(2, '0')}:${String(seedDate.getMinutes()).padStart(2, '0')}`;
+  const [time, setTime] = useState<string>(seedTimeStr);
+
+  const [title, setTitle] = useState<string>(
+    editLog && !GENERIC_TITLES.includes(editLog.title) ? editLog.title : ''
+  );
 
   const handleSave = () => {
     const val = parseFloat(distance);
@@ -37,7 +50,7 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
       const [hours, minutes] = time.split(':').map(Number);
       const finalDate = new Date(year, month - 1, day, hours, minutes);
 
-      onSave(valInKm, finalDate.toISOString());
+      onSave(valInKm, finalDate.toISOString(), title.trim());
     }
   };
 
@@ -84,11 +97,13 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
   return (
     <div className="flex flex-col min-h-full bg-background-light font-display pb-4">
       <header className="flex justify-between items-center px-6 pt-8 pb-2">
-        <h1 className="text-2xl font-black text-black uppercase tracking-wider">Log Walk</h1>
+        <h1 className="text-2xl font-black text-black uppercase tracking-wider">{isEditing ? 'Edit Walk' : 'Log Walk'}</h1>
         <button
-          onClick={() => onChangeView('settings')}
+          onClick={() => isEditing ? onCancel() : onChangeView('settings')}
           className="bg-white border-[3px] border-black p-2 shadow-hard-sm active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
-          <Settings size={24} className="text-black" strokeWidth={2.5} />
+          {isEditing
+            ? <span className="text-black font-black text-sm uppercase px-1">Cancel</span>
+            : <Settings size={24} className="text-black" strokeWidth={2.5} />}
         </button>
       </header>
 
@@ -112,6 +127,26 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
             <p className="text-2xl font-bold text-black mt-2 bg-white inline-block px-4 py-1 border-[3px] border-black shadow-hard-sm rounded-none uppercase">
               {unitLabel}
             </p>
+          </div>
+        </div>
+
+        {/* Title Input */}
+        <div className="w-full max-w-sm relative">
+          <div className="w-full bg-white border-[3px] border-black shadow-hard rounded-none p-4 flex items-center gap-4">
+            <div className="w-12 h-12 bg-primary border-2 border-black rounded-none flex items-center justify-center shadow-hard-sm shrink-0">
+              <Tag size={24} className="text-black" strokeWidth={2.5} />
+            </div>
+            <div className="text-left flex-1 min-w-0">
+              <p className="text-xs font-bold text-black uppercase tracking-widest mb-1">Name</p>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Walk at the beach"
+                maxLength={40}
+                className="w-full bg-transparent border-none text-lg font-bold text-black placeholder:text-black/30 focus:ring-0 focus:outline-none p-0 m-0"
+              />
+            </div>
           </div>
         </div>
 
@@ -176,8 +211,10 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
             disabled={!distance || parseFloat(distance) <= 0}
             className="w-full bg-teal-accent disabled:opacity-50 disabled:cursor-not-allowed border-[4px] border-black shadow-hard-lg rounded-none py-4 flex items-center justify-center gap-3 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all transform hover:-translate-y-1"
           >
-            <PlusCircle size={32} className="text-black" strokeWidth={2.5} />
-            <span className="text-xl font-black text-black uppercase tracking-wide">Add to Goal</span>
+            {isEditing
+              ? <Check size={32} className="text-black" strokeWidth={2.5} />
+              : <PlusCircle size={32} className="text-black" strokeWidth={2.5} />}
+            <span className="text-xl font-black text-black uppercase tracking-wide">{isEditing ? 'Save Changes' : 'Add to Goal'}</span>
           </button>
         </div>
 
