@@ -31,3 +31,6 @@ android/capacitor.settings.gradle
 # Keystores & Compiled Releases
 KeyStore/
 android/app/release/
+
+# Play Console exports (may contain user feedback / personal data)
+*_feedback.pdf
