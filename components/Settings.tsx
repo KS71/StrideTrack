@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { UserPreferences } from '../types';
-import { User, MapPin, Calendar, Bell, Moon, Sun, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity, Globe } from 'lucide-react';
+import { User, MapPin, Calendar, Bell, Moon, Sun, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity, Globe, Stethoscope } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { Capacitor } from '@capacitor/core';
-import { requestHealthConnectPermissions } from '../utils/healthConnect';
+import { requestHealthConnectPermissions, diagnoseHealthConnect, generateHealthConnectId, HealthConnectDiagnostics } from '../utils/healthConnect';
 import { Health } from '@capgo/capacitor-health';
 
 interface SettingsProps {
@@ -17,6 +17,7 @@ interface SettingsProps {
   isSyncing: boolean;
   onSync: (user: any, currentState?: any) => Promise<any>;
   onResetAllData: () => void;
+  deletedHealthConnectIds?: string[];
 }
 
 interface ModalProps {
@@ -66,13 +67,19 @@ const Settings: React.FC<SettingsProps> = ({
   user,
   isSyncing,
   onSync,
-  onResetAllData
+  onResetAllData,
+  deletedHealthConnectIds = []
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showRoadmap, setShowRoadmap] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showHealthHelp, setShowHealthHelp] = useState(false);
+
+  // Health Connect diagnostics
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [diagnosticsLoading, setDiagnosticsLoading] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<HealthConnectDiagnostics | null>(null);
 
   // Authentication State
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -126,6 +133,45 @@ const Settings: React.FC<SettingsProps> = ({
       } else {
         alert("Could not enable sync. Please ensure Google Health Connect is installed on your device and permissions are granted.");
       }
+    }
+  };
+
+  const handleRunDiagnostics = async () => {
+    setShowDiagnostics(true);
+    setDiagnosticsLoading(true);
+    setDiagnostics(null);
+    try {
+      const report = await diagnoseHealthConnect();
+      setDiagnostics(report);
+    } catch (e: any) {
+      setDiagnostics({
+        available: false,
+        error: e?.message || 'Diagnostics failed unexpectedly.',
+        windowStart: '',
+        windowEnd: '',
+        totalSessions: 0,
+        walkAndHikeSessions: 0,
+        keptAfterDeduplication: 0,
+        typeBreakdown: [],
+        sessions: []
+      });
+    } finally {
+      setDiagnosticsLoading(false);
+    }
+  };
+
+  const formatDiagnosticsTime = (iso: string) => {
+    const d = new Date(iso);
+    return `${d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
+  const handleCopyDiagnostics = async () => {
+    if (!diagnostics) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(diagnostics, null, 2));
+      alert('Diagnostics report copied to clipboard.');
+    } catch (e) {
+      alert('Could not copy to clipboard on this device.');
     }
   };
 
@@ -408,6 +454,13 @@ const Settings: React.FC<SettingsProps> = ({
                   >
                     Connection Guide
                   </button>
+                  <button
+                    onClick={handleRunDiagnostics}
+                    className="bg-orange-100 hover:bg-orange-200 border-[3px] border-black px-2.5 py-1.5 font-black text-[10px] uppercase shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-0 transition-all text-black flex items-center gap-1"
+                  >
+                    <Stethoscope size={12} strokeWidth={3} />
+                    Diagnose
+                  </button>
                 </div>
               </div>
             )}
@@ -636,7 +689,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.3.5</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.3.6</span>
             </div>
           </div>
         </div>
@@ -748,6 +801,150 @@ const Settings: React.FC<SettingsProps> = ({
             </ul>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={showDiagnostics}
+        onClose={() => setShowDiagnostics(false)}
+        title="Diagnostics"
+        icon={<Stethoscope size={24} className="text-black" strokeWidth={2.5} />}
+      >
+        {diagnosticsLoading && (
+          <div className="flex items-center gap-2 justify-center py-6">
+            <RefreshCw size={18} className="animate-spin" strokeWidth={3} />
+            <span className="font-black uppercase text-xs">Reading Health Connect...</span>
+          </div>
+        )}
+
+        {!diagnosticsLoading && diagnostics && !diagnostics.available && (
+          <div className="bg-red-100 border-[3px] border-red-700 p-3 text-xs font-black uppercase text-red-800 leading-tight">
+            {diagnostics.error || 'Health Connect is not available.'}
+          </div>
+        )}
+
+        {!diagnosticsLoading && diagnostics && diagnostics.available && (
+          <div className="space-y-4">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-black/60 leading-tight">
+              Window: {formatDiagnosticsTime(diagnostics.windowStart)} &rarr; {formatDiagnosticsTime(diagnostics.windowEnd)}
+            </p>
+
+            {diagnostics.permissions.length > 0 && (
+              <div>
+                <h4 className="font-black uppercase text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-2">
+                  Permissions
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {diagnostics.permissions.map(p => (
+                    <span
+                      key={p.type}
+                      className={`text-[10px] font-black uppercase border-2 border-black px-1.5 py-0.5 ${p.granted ? 'bg-green-200' : 'bg-red-200'}`}
+                    >
+                      {p.type}: {p.granted ? 'Granted' : 'Denied'}
+                    </span>
+                  ))}
+                </div>
+                {diagnostics.permissions.some(p => p.type === 'distance' && !p.granted) && (
+                  <div className="bg-red-100 border-[3px] border-red-700 p-2 mt-2 text-[11px] font-bold leading-snug text-red-900">
+                    Distance permission is missing, so every walk imports as 0 km. Tap "Adjust
+                    Permissions" and allow Distance.
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-2">
+              <div className="border-[3px] border-black p-2 bg-white text-center">
+                <div className="text-xl font-black leading-none">{diagnostics.totalSessions}</div>
+                <div className="text-[9px] font-black uppercase mt-1 leading-tight">Sessions</div>
+              </div>
+              <div className="border-[3px] border-black p-2 bg-teal-50 text-center">
+                <div className="text-xl font-black leading-none">{diagnostics.walkAndHikeSessions}</div>
+                <div className="text-[9px] font-black uppercase mt-1 leading-tight">Walk/Hike</div>
+              </div>
+              <div className="border-[3px] border-black p-2 bg-green-50 text-center">
+                <div className="text-xl font-black leading-none">{diagnostics.keptAfterDeduplication}</div>
+                <div className="text-[9px] font-black uppercase mt-1 leading-tight">Imported</div>
+              </div>
+            </div>
+
+            {diagnostics.totalSessions === 0 && (
+              <div className="bg-yellow-100 border-[3px] border-black p-3 text-[11px] font-bold leading-snug">
+                Health Connect returned no exercise sessions at all. Either no app is writing
+                workouts to Health Connect, or StrideTrack is missing the Exercise read permission.
+                Check "Adjust Permissions".
+              </div>
+            )}
+
+            {diagnostics.typeBreakdown.length > 0 && (
+              <div>
+                <h4 className="font-black uppercase text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-2">
+                  Types found
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {diagnostics.typeBreakdown.map(t => (
+                    <span
+                      key={t.type}
+                      className={`text-[10px] font-black uppercase border-2 border-black px-1.5 py-0.5 ${t.type === 'walking' || t.type === 'hiking' ? 'bg-teal-200' : 'bg-gray-100 text-black/50'}`}
+                    >
+                      {t.type} &times;{t.count}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[9px] font-bold uppercase text-black/50 mt-2 leading-tight">
+                  Only walking and hiking are imported. Greyed-out types are ignored.
+                </p>
+              </div>
+            )}
+
+            {diagnostics.sessions.length > 0 && (
+              <div>
+                <h4 className="font-black uppercase text-[10px] bg-black text-white px-2 py-0.5 inline-block mb-2">
+                  Sessions
+                </h4>
+                <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                  {diagnostics.sessions.map((s, i) => {
+                    // A session the user deleted in StrideTrack is deliberately never re-imported
+                    const isDeleted = deletedHealthConnectIds.includes(generateHealthConnectId(s.startDate));
+                    const status = isDeleted ? 'Deleted' : s.kept ? 'Imported' : 'Skipped';
+                    const rowStyle = isDeleted
+                      ? 'bg-red-50 text-black/60'
+                      : s.kept
+                        ? 'bg-green-50'
+                        : 'bg-gray-50 text-black/60';
+                    return (
+                    <div
+                      key={`${s.startDate}-${i}`}
+                      className={`border-2 border-black p-2 text-[10px] font-bold leading-tight ${rowStyle}`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-black uppercase">{s.workoutType || 'unknown'}</span>
+                        <span className="font-black">{s.distanceKm.toFixed(2)} km</span>
+                      </div>
+                      <div className="mt-0.5">
+                        {formatDiagnosticsTime(s.startDate)} &rarr; {formatDiagnosticsTime(s.endDate)}
+                        {' '}({Math.floor(s.durationSeconds / 3600)}h {Math.floor((s.durationSeconds % 3600) / 60)}m)
+                      </div>
+                      <div className="mt-0.5 flex items-center justify-between gap-2">
+                        <span className="truncate">{s.sourceName}</span>
+                        <span className="font-black uppercase flex-shrink-0">
+                          {status}
+                        </span>
+                      </div>
+                    </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={handleCopyDiagnostics}
+              className="w-full bg-white border-[3px] border-black py-2 font-black uppercase text-[10px] text-black shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-0 transition-all"
+            >
+              Copy report
+            </button>
+          </div>
+        )}
       </Modal>
 
       <Modal

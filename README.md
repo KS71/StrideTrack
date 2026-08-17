@@ -93,6 +93,12 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.3.6:**
+- **Fixed Stalled Health Connect Imports:** The workout query relied on the plugin's default cap of 100 records, which returns only the *oldest* 100 sessions in range. Once a user had more than 100 workouts in their sync window, no new walks were imported at all. The query now pages through every session, and the window is capped at 90 days to keep it cheap.
+- **Fixed 0 km Imports:** Distance is now read from Health Connect's distance records directly. The plugin requests distance and active calories in a single aggregate call, which always failed with a SecurityException because StrideTrack intentionally does not hold the calories permission — silently discarding the distance along with it.
+- **No More Double-Counted Walks:** When the same walk is recorded by both a watch and the phone, only the more trustworthy source is kept. Sources are ranked (Garmin, Polar, Strava above Samsung Health, Fitbit and Google Fit), and overlapping sessions from lower-ranked sources are discarded.
+- **Health Connect Diagnostics:** New Diagnose button under Settings → Integrations reports permission status, every session Health Connect returns with its type, time, distance and source, and whether each one was imported, skipped or previously deleted.
+
 **v2.3.5:**
 - **Fixed Goal Input:** The distance goal field can now be cleared completely instead of leaving a stubborn "0" behind, which previously caused values like "010" when typing a new goal. Tapping the field also selects the current value so it can be overwritten directly.
 - **Save Confirmation:** Saving a goal now shows a clear "Goal saved" banner. Previously the confirmation was wiped instantly by a state refresh, making it look like nothing happened and prompting repeat taps.

@@ -909,6 +909,7 @@ const App: React.FC = () => {
                     isSyncing={isSyncing}
                     onSync={syncData}
                     onResetAllData={handleResetAllData}
+                    deletedHealthConnectIds={state.deletedHealthConnectIds || []}
                   />
                 )}
               </motion.div>
