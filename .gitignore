@@ -34,3 +34,7 @@ android/app/release/
 
 # Play Console exports (may contain user feedback / personal data)
 *_feedback.pdf
+
+# Claude skills (local tooling, not part of the shipped app)
+.claude/skills/
+skills-lock.json
