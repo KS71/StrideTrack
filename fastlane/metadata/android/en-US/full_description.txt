@@ -1,0 +1,10 @@
+StrideTrack is a simple app for tracking your daily steps and walking goals.
+
+The app works fully offline with no account required. If you don't want to create an account, you can instead make a local backup directly on your phone. If you want to sync your data across devices, you can optionally create a profile, which connects to Supabase for account storage. Connecting a Google Health Connect account is also optional and only used if you choose to enable it.
+
+Features:
+- Track walking goals
+- Works without an account
+- Local backup on your device
+- Optional cloud sync via Supabase
+- Optional Google Health Connect integration
