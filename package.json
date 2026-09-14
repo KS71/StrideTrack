@@ -1,7 +1,7 @@
 {
   "name": "walkgoal",
   "private": true,
-  "version": "2.3.8",
+  "version": "2.3.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,10 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor/android": "^8.0.1",
+    "@capacitor/android": "^8.5.2",
     "@capacitor/app": "^8.1.0",
-    "@capacitor/cli": "^8.0.1",
-    "@capacitor/core": "^8.0.1",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@capacitor/filesystem": "^8.1.0",
     "@capacitor/share": "^8.0.0",
     "@capgo/capacitor-health": "^8.6.0",

@@ -93,8 +93,11 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.3.9:**
+- **Per-Install Usage Id:** The anonymous usage ping now includes a random id generated on-device and stored only in the app, so repeat opens from the same install can be told apart from different installs. No personal data or location is included, and it resets if the app's data is cleared or it is reinstalled.
+
 **v2.3.8:**
-- **Anonymous Usage Tracking:** StrideTrack now sends a tiny, fully anonymous ping (event type + timestamp only) when the app is opened or a walk is logged, so the developer can see whether the app is actually being used. No personal data, device ID or location is ever included, and it can be disabled per-device under Settings → Developer → Exclude This Device From Stats.
+- **Anonymous Usage Tracking:** StrideTrack now sends a tiny, fully anonymous ping (event type + timestamp only) when the app is opened or a walk is logged, so the developer can see whether the app is actually being used. No personal data or location is ever included, and it can be disabled per-device under Settings → Developer → Exclude This Device From Stats.
 - **Android Release Build Hardening:** Release builds now enable code minification and resource shrinking, reducing app size and improving obfuscation.
 
 **v2.3.6:**
