@@ -38,3 +38,6 @@ android/app/release/
 # Claude skills (local tooling, not part of the shipped app)
 .claude/skills/
 skills-lock.json
+
+# Firebase config (contains API key, keep out of public repo)
+android/app/google-services.json
