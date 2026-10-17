@@ -82,10 +82,10 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
     const weekDaysHeader = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
     return (
-        <div className="flex flex-col min-h-full bg-background-light pb-4">
+        <div className="flex flex-col min-h-full bg-background-light">
             {/* Header - removed */}
 
-            <main className="flex-1 px-4 pt-12 space-y-3 pb-8">
+            <main className="my-auto px-4 py-4 space-y-3">
                 {/* Period Selector */}
                 <div className="grid grid-cols-3 gap-0 border-[3px] border-black bg-white shadow-hard">
                     {(['week', 'month', 'year'] as Period[]).map((p) => (
@@ -199,7 +199,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                 </div>
 
                 {/* Consistency / Heatmap - Compact */}
-                <div className="space-y-2 pt-1 pb-4">
+                <div className="space-y-2 pt-1">
                     <div className="flex justify-between items-center">
                         <div className="bg-black text-white px-2 py-0.5 border-[3px] border-black">
                             <h2 className="text-xs font-black uppercase tracking-wider">Consistency</h2>
