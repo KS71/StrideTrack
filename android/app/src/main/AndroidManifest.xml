@@ -46,6 +46,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- The app has no ads: remove the advertising ID permissions added by Firebase Analytics -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+
     <!-- Health Connect Read Permissions (only what the app actually uses) -->
     <uses-permission android:name="android.permission.health.READ_DISTANCE" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE" />
