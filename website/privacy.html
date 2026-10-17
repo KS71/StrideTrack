@@ -167,6 +167,9 @@
           To understand whether the App is actually being used, StrideTrack sends a small, fully anonymous signal each time the App is opened or a walk is logged. This contains an event type (e.g. "app opened" or "walk logged"), a timestamp, and a random id that is generated on your device and stored only in the App — no name, email, account information, advertising ID, IP address, GPS location, or walk data is included. This random id lets us tell repeat use on the same install apart from a new install; it cannot be used to identify you personally, and it is reset if you clear the App's data or reinstall it.
         </p>
         <p>
+          In addition, the Android app uses <strong>Google Firebase Analytics</strong> to collect aggregated, non-identifying usage statistics such as app opens, session counts, app version, device model, Android version and approximate country, so we can understand how the App is used and keep it stable. Firebase uses an app-instance identifier generated on your device; it does not receive your name, email, walk data, or Health Connect data. This data is processed by Google; see <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.
+        </p>
+        <p>
           You can disable this at any time from <strong>Settings → Developer → Exclude This Device From Stats</strong>. This is a per-device setting stored only on your phone and does not affect your walks, goals, or any other data.
         </p>
 
@@ -177,7 +180,7 @@
 
         <h2>5. Third-Party Sharing</h2>
         <p>
-          We do not sell, trade, or otherwise transfer your personal or health data to outside parties. Your data is yours. The only third-party service integrated is Supabase, which is used strictly as a secure host for your optional cloud sync backups, and only when you explicitly sign up for a cloud account.
+          We do not sell, trade, or otherwise transfer your personal or health data to outside parties. Your data is yours. The third-party services integrated are Supabase, which is used strictly as a secure host for your optional cloud sync backups (only when you explicitly sign up for a cloud account), and Google Firebase Analytics, which receives only the anonymous usage statistics described in section 3.
         </p>
 
         <h2>6. Data Retention and Deletion</h2>
