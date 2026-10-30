@@ -25,12 +25,13 @@ export interface GoalHistoryEntry {
 }
 
 export interface UserPreferences {
-  theme: 'dark' | 'light';
+  theme: 'dark' | 'light'; // Legacy, no longer used (dark mode was dropped). Kept so old saved data still parses.
   notifications: boolean;
   units: 'km' | 'mi';
   weekStart: 'monday' | 'sunday';
   timeFormat: '12h' | '24h';
   lastBackupDate?: string;
+  backupReminderDismissedAt?: string; // ISO string, hides the backup banner for a while
   lastSyncDate?: string;
   healthConnectSync?: boolean;
   healthConnectSyncDate?: string;

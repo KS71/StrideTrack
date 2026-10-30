@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { UserPreferences } from '../types';
-import { User, MapPin, Calendar, Bell, Moon, Sun, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity, Globe, Stethoscope } from 'lucide-react';
+import { User, MapPin, Calendar, Bell, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity, Globe, Stethoscope } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { Capacitor } from '@capacitor/core';
 import { requestHealthConnectPermissions, diagnoseHealthConnect, generateHealthConnectId, HealthConnectDiagnostics } from '../utils/healthConnect';
@@ -9,7 +9,6 @@ import { Health } from '@capgo/capacitor-health';
 
 interface SettingsProps {
   preferences: UserPreferences;
-  onToggleTheme: () => void;
   onUpdatePreferences: (updates: Partial<UserPreferences>) => void;
   onExport: () => void;
   onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -60,7 +59,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, icon, children })
 
 const Settings: React.FC<SettingsProps> = ({
   preferences,
-  onToggleTheme,
   onUpdatePreferences,
   onExport,
   onImport,
@@ -380,24 +378,6 @@ const Settings: React.FC<SettingsProps> = ({
                 </button>
               </div>
             </div>
-
-            {/* Theme Toggle */}
-            {/* 
-                <div className="bg-white border-[3px] border-black shadow-hard p-4 flex items-center justify-between cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
-                     onClick={onToggleTheme}
-                >
-                    <div className="flex items-center space-x-3">
-                        <div className="bg-indigo-200 border-[3px] border-black w-10 h-10 flex items-center justify-center shadow-none">
-                            {preferences.theme === 'dark' ? <Moon size={20} className="text-black" strokeWidth={2.5} /> : <Sun size={20} className="text-black" strokeWidth={2.5} />}
-                        </div>
-                        <span className="font-bold text-black">App Theme</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                         <span className="font-black text-sm text-black uppercase">{preferences.theme}</span>
-                         <ChevronRight size={20} className="text-black" strokeWidth={2.5} />
-                    </div>
-                </div>
-                */}
           </div>
         </div>
 
@@ -724,7 +704,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.4.1</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.4.2</span>
             </div>
           </div>
         </div>

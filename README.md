@@ -93,6 +93,12 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.4.2:**
+- **Backup Reminder:** Users without a cloud account now see a banner on the Dashboard when their last backup file is over 30 days old (or was never taken), with a one-tap "Back up" button. Dismissing it hides it for 7 days.
+- **Fixed Streak Counting:** The streak in History now uses the phone's local date instead of UTC, so a walk logged just after midnight counts on the correct day.
+- **Heatmap Respects Week Start:** The 28-day consistency grid on the Dashboard now starts on Sunday when that is selected in Settings.
+- **Removed Unused Dark Mode Code:** The hidden theme toggle and its logic were removed.
+
 **v2.3.9:**
 - **Per-Install Usage Id:** The anonymous usage ping now includes a random id generated on-device and stored only in the app, so repeat opens from the same install can be told apart from different installs. No personal data or location is included, and it resets if the app's data is cleared or it is reinstalled.
 

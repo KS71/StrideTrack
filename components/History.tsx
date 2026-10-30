@@ -370,45 +370,29 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, onEditLog, setVie
   );
 };
 
-// Simple Streak Helper (consecutive days)
+// Simple Streak Helper (consecutive days, using the phone's local date)
+const localDateKey = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
 const calculateStreak = (logs: WalkLog[]) => {
   if (!logs.length) return 0;
 
-  // Sort logs by date desc
-  const sortedLogs = [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Unique local calendar days that have at least one walk
+  const walkDays = new Set(logs.map(l => localDateKey(new Date(l.date))));
 
-  // Unique dates
-  const dates = Array.from(new Set(sortedLogs.map(l => l.date.split('T')[0])));
+  // The streak must still be alive: a walk today or yesterday
+  const cursor = new Date();
+  cursor.setHours(12, 0, 0, 0); // noon avoids DST edge cases when stepping back a day
+  if (!walkDays.has(localDateKey(cursor))) {
+    cursor.setDate(cursor.getDate() - 1);
+    if (!walkDays.has(localDateKey(cursor))) return 0;
+  }
 
-  if (dates.length === 0) return 0;
-
+  // Count backwards while every day has a walk
   let streak = 0;
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-
-  // Check if streak is active (has entry today or yesterday)
-  if (dates[0] !== today && dates[0] !== yesterday) return 0;
-
-  let currentDate = new Date(dates[0]);
-
-  for (let i = 0; i < dates.length; i++) {
-    const d = new Date(dates[i]);
-    // Check if d is consecutive to currentDate
-    const diffTime = Math.abs(currentDate.getTime() - d.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (i === 0) {
-      streak++;
-      currentDate = d;
-      continue;
-    }
-
-    if (diffDays === 1) {
-      streak++;
-      currentDate = d;
-    } else {
-      break;
-    }
+  while (walkDays.has(localDateKey(cursor))) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
   }
   return streak;
 }

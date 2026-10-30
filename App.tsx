@@ -404,26 +404,6 @@ const App: React.FC = () => {
     }
   }, [user]);
 
-  // Effect to apply theme class to html element based on state.preferences.theme
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (state.preferences.theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [state.preferences.theme]);
-
-  const toggleTheme = () => {
-    setState(prev => ({
-      ...prev,
-      preferences: {
-        ...prev.preferences,
-        theme: prev.preferences.theme === 'dark' ? 'light' : 'dark'
-      }
-    }));
-  };
-
   const updatePreferences = async (updates: Partial<UserPreferences>) => {
     let nextPref: UserPreferences | null = null;
     setState(prev => {
@@ -720,6 +700,28 @@ const App: React.FC = () => {
     }
   };
 
+  // --- Backup reminder ---
+  // Users without a cloud account keep all their data on the phone only. Nudge
+  // them to take a backup file if the last one is old (or never taken). Hidden
+  // when logged in, when there's nothing to back up, or shortly after dismissal.
+  const BACKUP_REMINDER_DAYS = 30;
+  const BACKUP_DISMISS_DAYS = 7;
+  const daysSince = (iso?: string) =>
+    iso ? (Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24) : Infinity;
+
+  const showBackupReminder =
+    !user &&
+    state.logs.length > 0 &&
+    daysSince(state.preferences.lastBackupDate) >= BACKUP_REMINDER_DAYS &&
+    daysSince(state.preferences.backupReminderDismissedAt) >= BACKUP_DISMISS_DAYS;
+
+  const handleDismissBackupReminder = () => {
+    setState(prev => ({
+      ...prev,
+      preferences: { ...prev.preferences, backupReminderDismissedAt: new Date().toISOString() }
+    }));
+  };
+
   const handleSetPeriod = (period: Period) => {
     setState(prev => ({ ...prev, activePeriod: period }));
   };
@@ -859,9 +861,11 @@ const App: React.FC = () => {
                     state={state}
                     setView={changeView}
                     setPeriod={handleSetPeriod}
-                    theme={state.preferences.theme}
                     units={state.preferences.units}
                     weekStart={state.preferences.weekStart}
+                    showBackupReminder={showBackupReminder}
+                    onBackupNow={handleExportData}
+                    onDismissBackupReminder={handleDismissBackupReminder}
                   />
                 )}
                 {view === 'history' && (
@@ -907,7 +911,6 @@ const App: React.FC = () => {
                 {view === 'settings' && (
                   <Settings
                     preferences={state.preferences}
-                    onToggleTheme={toggleTheme}
                     onUpdatePreferences={updatePreferences}
                     onExport={handleExportData}
                     onImport={handleImportData}

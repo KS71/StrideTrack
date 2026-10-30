@@ -1,18 +1,20 @@
 import React from 'react';
 import { AppState, View, Period } from '../types';
 import { calculateProgress, toDisplayDistance, getUnitLabel } from '../utils';
-import { TrendingUp, TrendingDown, Flame, Target, Settings, Flag } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, Settings, Flag, HardDriveDownload, X } from 'lucide-react';
 
 interface DashboardProps {
     state: AppState;
     setView: (view: View) => void;
     setPeriod: (period: Period) => void;
-    theme: 'light' | 'dark';
     units: 'km' | 'mi';
     weekStart: 'monday' | 'sunday';
+    showBackupReminder?: boolean;
+    onBackupNow?: () => void;
+    onDismissBackupReminder?: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units, weekStart }) => {
+const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units, weekStart, showBackupReminder, onBackupNow, onDismissBackupReminder }) => {
     // Current Period Target
     const rawTargetDistance = state.goals[state.activePeriod];
     // Stats calculation
@@ -41,26 +43,28 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
     const progressPercent = Math.min(stats.percentage, 100);
     const unitLabel = getUnitLabel(units).toUpperCase();
 
-    // Heatmap Grid Logic - 4 Weeks, Monday Start, Current Week Top
+    // Heatmap Grid Logic - 4 Weeks, respects the user's week start, Current Week Top
     const generateGridData = () => {
         const weeks = [];
         const today = new Date();
 
-        // Find Monday of the current week
+        // Find the first day of the current week (Monday or Sunday depending on preference)
         const dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
-        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust to get Monday
-        const currentMonday = new Date(today);
-        currentMonday.setDate(today.getDate() + diffToMonday);
+        const diffToStart = weekStart === 'monday'
+            ? (dayOfWeek === 0 ? -6 : 1 - dayOfWeek)
+            : -dayOfWeek;
+        const currentWeekStart = new Date(today);
+        currentWeekStart.setDate(today.getDate() + diffToStart);
 
         // Generate 4 weeks back
         for (let w = 0; w < 4; w++) {
             const weekDays = [];
-            const mondayOfWeek = new Date(currentMonday);
-            mondayOfWeek.setDate(currentMonday.getDate() - (w * 7));
+            const firstDayOfWeek = new Date(currentWeekStart);
+            firstDayOfWeek.setDate(currentWeekStart.getDate() - (w * 7));
 
             for (let d = 0; d < 7; d++) {
-                const dayDate = new Date(mondayOfWeek);
-                dayDate.setDate(mondayOfWeek.getDate() + d);
+                const dayDate = new Date(firstDayOfWeek);
+                dayDate.setDate(firstDayOfWeek.getDate() + d);
                 const dateStr = dayDate.toDateString();
 
                 const dayLogs = state.logs.filter(log => new Date(log.date).toDateString() === dateStr);
@@ -79,7 +83,11 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
     };
 
     const gridWeeks = generateGridData();
-    const weekDaysHeader = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const weekDaysHeader = weekStart === 'monday'
+        ? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+        : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    // Highlight Sunday in pink: last column for Monday start, first column for Sunday start
+    const sundayIndex = weekStart === 'monday' ? 6 : 0;
 
     return (
         <div className="flex flex-col min-h-full bg-background-light">
@@ -101,6 +109,36 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                         </button>
                     ))}
                 </div>
+
+                {/* Backup reminder - only for users without cloud sync and an old/missing backup */}
+                {showBackupReminder && (
+                    <div className="bg-accent-pink border-[3px] border-black shadow-hard p-2.5 flex items-center gap-2.5 mt-4">
+                        <div className="w-8 h-8 shrink-0 bg-white border-2 border-black flex items-center justify-center shadow-hard-sm">
+                            <HardDriveDownload className="text-black" size={16} strokeWidth={2.5} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="font-black text-[10px] uppercase tracking-wider text-black leading-tight">
+                                {state.preferences.lastBackupDate ? 'Backup is over 30 days old' : 'No backup yet'}
+                            </p>
+                            <p className="text-[9px] font-bold text-black/70 leading-tight mt-0.5">
+                                Your walks only live on this phone.
+                            </p>
+                        </div>
+                        <button
+                            onClick={onBackupNow}
+                            className="shrink-0 bg-white border-2 border-black shadow-hard-sm px-2 py-1.5 font-black text-[9px] uppercase text-black hover:translate-y-0.5 hover:shadow-none transition-all"
+                        >
+                            Back up
+                        </button>
+                        <button
+                            onClick={onDismissBackupReminder}
+                            aria-label="Dismiss"
+                            className="shrink-0 w-6 h-6 flex items-center justify-center text-black hover:bg-black hover:text-white transition-colors"
+                        >
+                            <X size={14} strokeWidth={3} />
+                        </button>
+                    </div>
+                )}
 
                 {/* Main Goal Card - Compact */}
                 <div className="w-full bg-primary border-[3px] border-black shadow-hard flex flex-col p-3 relative mt-4">
@@ -212,7 +250,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                     <div className="bg-white border-[3px] border-black p-3 shadow-hard">
                         <div className="grid grid-cols-7 gap-1.5 mb-1.5 border-b-2 border-black/10 pb-1">
                             {weekDaysHeader.map((day, i) => (
-                                <div key={i} className={`text-center text-[9px] font-black ${i === 6 ? 'text-accent-pink' : 'text-black'}`}>{day}</div>
+                                <div key={i} className={`text-center text-[9px] font-black ${i === sundayIndex ? 'text-accent-pink' : 'text-black'}`}>{day}</div>
                             ))}
                         </div>
                         <div className="flex flex-col gap-1.5">
