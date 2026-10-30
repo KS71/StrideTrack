@@ -79,12 +79,13 @@
 
 ## 🚀 3. Nye funktioner (prioriteret efter værdi i forhold til arbejde)
 
-- [x] **3.1 Badges (egen skærm via Settings)** *(lavet okt. 2026, afventer test på telefon)*
+- [x] **3.1 Badges (egen skærm via Settings)** *(udgivet i 2.5.0, udvidet i 2.5.1)*
   *Besluttet (okt. 2026):* Forsiden skal ikke ændres. Streak bliver, hvor den er (History). Badges får en egen skærm, som åbnes fra et menupunkt "Badges" i Settings.
   - Skærmen viser alle mærker i appens stil: optjente med farve og dato, låste grå/stiplede med fremskridt (fx "33,8 / 42,2 km").
   - Lille fejring i appens stil, når et nyt mærke optjenes.
   - Første sæt på 12 mærker: First steps (1 tur), 10 walks, Globetrotter (100 ture), Marathon (42,2 km i alt), 100 km, 500 km, 1000 km, Month master (månedsmål nået), Week warrior (ugemål 3 uger i træk), Year champion (årsmål nået), On fire (7 dage i træk), 30-day streak.
   - Beregnes ud fra `logs`, så brugere med historik får mærkerne med det samme. Kun optjeningsdatoer gemmes.
+  - *Udvidet okt. 2026 til 29 mærker:* flere trin for antal ture (25, 50, 250, 500, 1000), 5000 km, længste enkelttur (10 / 21,1 / 42,2 km), 100-dages streak, 10 uger og 6 måneder i træk, dobbelt ugemål, Early Bird, Night Owl, Comeback og Connected (Health Connect). Distance-mærker har egne runde grænser for miles (fx 500 km / 300 mi).
 
 - [ ] **3.2 Påmindelser**
   Preference-feltet `notifications` findes, men gør ingenting. Lokal notifikation via `@capacitor/local-notifications`, fx torsdag aften: "Du mangler 4 km for at nå ugemålet – 3 dage tilbage."

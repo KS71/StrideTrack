@@ -45,6 +45,11 @@ const INITIAL_STATE: AppState = {
 
 const STORAGE_KEY = 'walkgoal_tracker_data_v1';
 
+// Screens laid out to fit exactly one screen (content centred vertically), so
+// there is nothing to scroll in normal use. Scrolling stays enabled so input
+// fields remain reachable when the on-screen keyboard shrinks the viewport.
+const FIXED_VIEWS: View[] = ['dashboard', 'goal-setup', 'yearly-overview', 'log'];
+
 const App: React.FC = () => {
   const [view, setView] = useState<View>('dashboard');
   const [direction, setDirection] = useState(0);
@@ -717,7 +722,7 @@ const App: React.FC = () => {
     const fresh = badgeStatuses.filter(b => b.earned && !seen.has(b.id));
     setNewBadges(fresh);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.logs, state.goals, state.goalHistory, state.preferences.weekStart]);
+  }, [state.logs, state.goals, state.goalHistory, state.preferences.weekStart, state.preferences.units]);
 
   const markBadgesSeen = () => {
     const earnedIds = badgeStatuses.filter(b => b.earned).map(b => b.id);
@@ -881,7 +886,7 @@ const App: React.FC = () => {
                   x: { type: "spring", stiffness: 300, damping: 30 },
                   opacity: { duration: 0.2 }
                 }}
-                className="absolute inset-0 overflow-y-auto no-scrollbar pb-24"
+                className={`absolute inset-0 no-scrollbar overflow-y-auto ${FIXED_VIEWS.includes(view) ? 'pb-[calc(4rem+env(safe-area-inset-bottom))]' : 'pb-24'}`}
               >
                 {view === 'dashboard' && (
                   <Dashboard
@@ -893,6 +898,7 @@ const App: React.FC = () => {
                     showBackupReminder={showBackupReminder}
                     onBackupNow={handleExportData}
                     onDismissBackupReminder={handleDismissBackupReminder}
+                    onOpenBadges={() => setShowBadges(true)}
                   />
                 )}
                 {view === 'history' && (
@@ -968,6 +974,7 @@ const App: React.FC = () => {
           badges={newBadges}
           onClose={markBadgesSeen}
           onViewAll={() => { markBadgesSeen(); setShowBadges(true); }}
+          units={state.preferences.units}
         />
         {showRecoveryModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">

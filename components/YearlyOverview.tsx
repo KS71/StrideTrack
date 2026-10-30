@@ -108,11 +108,11 @@ const YearlyOverview: React.FC<YearlyOverviewProps> = ({ state, units, weekStart
 
 
     return (
-        <div className="flex flex-col min-h-full bg-background-light pb-4">
+        <div className="flex flex-col h-full bg-background-light">
             {/* Header - removed to match Dashboard offset */}
 
-            <main className="flex-1 px-4 pt-12 space-y-6 pb-8">
-                <h1 className="text-2xl font-black uppercase tracking-tight text-black mb-2" style={{ WebkitTextStroke: '1px black' }}>
+            <main className="flex-1 min-h-0 flex flex-col justify-center px-4 py-3 gap-4">
+                <h1 className="text-2xl font-black uppercase tracking-tight text-black shrink-0" style={{ WebkitTextStroke: '1px black' }}>
                     Yearly Progress
                 </h1>
 
@@ -120,7 +120,7 @@ const YearlyOverview: React.FC<YearlyOverviewProps> = ({ state, units, weekStart
 
 
                 {/* 52 Weeks Grid */}
-                <div className="space-y-4">
+                <div className="space-y-3 shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="bg-accent-pink text-black px-3 py-1.5 border-[3px] border-black shadow-hard-sm">
                             <h2 className="text-xs font-black uppercase tracking-wider">Weeks (52)</h2>
@@ -148,7 +148,7 @@ const YearlyOverview: React.FC<YearlyOverviewProps> = ({ state, units, weekStart
                 </div>
 
                 {/* 12 Months Grid */}
-                <div className="space-y-4">
+                <div className="flex-1 min-h-0 max-h-[25rem] flex flex-col gap-3">
                     <div className="flex items-center gap-3">
                         <div className="bg-[#ffcc00] text-black px-3 py-1.5 border-[3px] border-black shadow-hard-sm">
                             <h2 className="text-xs font-black uppercase tracking-wider">Months (12)</h2>
@@ -156,11 +156,11 @@ const YearlyOverview: React.FC<YearlyOverviewProps> = ({ state, units, weekStart
                         <div className="flex-1 h-1.5 bg-black rounded-full" />
                     </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-4 gap-2">
                         {monthlyData.map((month) => (
                             <div
                                 key={`m-${month.index}`}
-                                className={`border-[3px] border-black p-2 flex flex-col items-center justify-center aspect-[4/3] shadow-hard-sm transition-transform ${month.hasWalk
+                                className={`border-[3px] border-black p-1 flex flex-col items-center justify-center min-h-0 shadow-hard-sm transition-transform ${month.hasWalk
                                     ? 'bg-[#13ec49]'
                                     : month.isActive
                                         ? 'bg-gray-100'

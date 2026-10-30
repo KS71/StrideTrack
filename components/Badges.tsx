@@ -1,23 +1,47 @@
 import React from 'react';
-import { X, Award, Footprints, ListChecks, Globe, Medal, Star, Trophy, Crown, Flame, CalendarDays, CalendarCheck, Swords, Mountain, Lock } from 'lucide-react';
+import { X, Award, Footprints, ListChecks, Repeat, Hash, Globe, ShieldCheck, Sparkles, Infinity as InfinityIcon, Medal, Star, Mountain, Trophy, Map, Route, Timer, Flag, Flame, CalendarDays, Dumbbell, Swords, Hammer, CalendarCheck, Sun, Crown, Zap, Sunrise, Moon, Undo2, Watch, Lock } from 'lucide-react';
 import { AppState } from '../types';
-import { BadgeStatus, computeBadges } from '../utils/badges';
+import { BadgeStatus, computeBadges, targetKm } from '../utils/badges';
 import { toDisplayDistance, getUnitLabel } from '../utils';
 
 // Icon + colour per badge, in the app's neo-brutalist palette
+const I = (C: React.ComponentType<any>) => <C size={22} strokeWidth={2.5} />;
 const BADGE_STYLE: Record<string, { icon: React.ReactNode; bg: string }> = {
-  first_steps:   { icon: <Footprints size={22} strokeWidth={2.5} />,   bg: 'bg-primary' },
-  ten_walks:     { icon: <ListChecks size={22} strokeWidth={2.5} />,   bg: 'bg-accent-pink' },
-  globetrotter:  { icon: <Globe size={22} strokeWidth={2.5} />,        bg: 'bg-teal-accent text-white' },
-  marathon:      { icon: <Medal size={22} strokeWidth={2.5} />,        bg: 'bg-[#13ec49]' },
-  km_100:        { icon: <Star size={22} strokeWidth={2.5} />,         bg: 'bg-primary' },
-  km_500:        { icon: <Mountain size={22} strokeWidth={2.5} />,     bg: 'bg-accent-pink' },
-  km_1000:       { icon: <Trophy size={22} strokeWidth={2.5} />,       bg: 'bg-teal-accent text-white' },
-  on_fire:       { icon: <Flame size={22} strokeWidth={2.5} />,        bg: 'bg-orange-300' },
-  streak_30:     { icon: <CalendarDays size={22} strokeWidth={2.5} />, bg: 'bg-orange-400' },
-  month_master:  { icon: <CalendarCheck size={22} strokeWidth={2.5} />, bg: 'bg-[#13ec49]' },
-  week_warrior:  { icon: <Swords size={22} strokeWidth={2.5} />,       bg: 'bg-primary' },
-  year_champion: { icon: <Crown size={22} strokeWidth={2.5} />,        bg: 'bg-accent-pink' },
+  // walks
+  first_steps:   { icon: I(Footprints),   bg: 'bg-primary' },
+  ten_walks:     { icon: I(ListChecks),   bg: 'bg-accent-pink' },
+  walks_25:      { icon: I(Repeat),       bg: 'bg-teal-accent text-white' },
+  walks_50:      { icon: I(Hash),         bg: 'bg-[#13ec49]' },
+  globetrotter:  { icon: I(Globe),        bg: 'bg-primary' },
+  walks_250:     { icon: I(ShieldCheck),  bg: 'bg-accent-pink' },
+  walks_500:     { icon: I(Sparkles),     bg: 'bg-teal-accent text-white' },
+  walks_1000:    { icon: I(InfinityIcon), bg: 'bg-[#13ec49]' },
+  // distance
+  marathon:      { icon: I(Medal),        bg: 'bg-[#13ec49]' },
+  km_100:        { icon: I(Star),         bg: 'bg-primary' },
+  km_500:        { icon: I(Mountain),     bg: 'bg-accent-pink' },
+  km_1000:       { icon: I(Trophy),       bg: 'bg-teal-accent text-white' },
+  km_5000:       { icon: I(Map),          bg: 'bg-[#13ec49]' },
+  // single walk
+  single_10:     { icon: I(Route),        bg: 'bg-primary' },
+  single_half:   { icon: I(Timer),        bg: 'bg-accent-pink' },
+  single_full:   { icon: I(Flag),         bg: 'bg-teal-accent text-white' },
+  // streaks
+  on_fire:       { icon: I(Flame),        bg: 'bg-orange-300' },
+  streak_30:     { icon: I(CalendarDays), bg: 'bg-orange-400' },
+  streak_100:    { icon: I(Dumbbell),     bg: 'bg-orange-500 text-white' },
+  // goals
+  week_warrior:  { icon: I(Swords),       bg: 'bg-primary' },
+  weeks_10:      { icon: I(Hammer),       bg: 'bg-accent-pink' },
+  month_master:  { icon: I(CalendarCheck), bg: 'bg-[#13ec49]' },
+  months_6:      { icon: I(Sun),          bg: 'bg-primary' },
+  year_champion: { icon: I(Crown),        bg: 'bg-accent-pink' },
+  goal_crusher:  { icon: I(Zap),          bg: 'bg-teal-accent text-white' },
+  // fun
+  early_bird:    { icon: I(Sunrise),      bg: 'bg-primary' },
+  night_owl:     { icon: I(Moon),         bg: 'bg-indigo-300' },
+  comeback:      { icon: I(Undo2),        bg: 'bg-accent-pink' },
+  connected:     { icon: I(Watch),        bg: 'bg-teal-accent text-white' },
 };
 
 export const badgeIcon = (id: string) => BADGE_STYLE[id]?.icon ?? <Award size={22} strokeWidth={2.5} />;
@@ -29,20 +53,28 @@ const formatDate = (iso: string) =>
 // Progress text + fraction for a locked badge
 const progressInfo = (b: BadgeStatus, units: 'km' | 'mi'): { text: string; fraction: number } => {
   const unit = getUnitLabel(units);
+  const tKm = targetKm(b, units);
   switch (b.kind) {
     case 'count':
       return { text: `${b.progress} / ${b.target} walks`, fraction: b.progress / b.target };
     case 'distance':
       return {
-        text: `${toDisplayDistance(b.progress, units)} / ${toDisplayDistance(b.target, units)} ${unit}`,
-        fraction: b.progress / b.target
+        text: `${toDisplayDistance(b.progress, units)} / ${toDisplayDistance(tKm, units)} ${unit}`,
+        fraction: b.progress / tKm
+      };
+    case 'single':
+      return {
+        text: `Longest: ${toDisplayDistance(b.progress, units)} / ${toDisplayDistance(tKm, units)} ${unit}`,
+        fraction: b.progress / tKm
       };
     case 'streak':
       return { text: `Best: ${b.progress} / ${b.target} days`, fraction: b.progress / b.target };
-    case 'goal':
-      if (b.id === 'week_warrior') {
-        return { text: `${b.progress} / ${b.target} weeks in a row`, fraction: b.progress / b.target };
-      }
+    case 'weeks':
+      return { text: `${b.progress} / ${b.target} weeks in a row`, fraction: b.progress / b.target };
+    case 'months':
+      return { text: `${b.progress} / ${b.target} months in a row`, fraction: b.progress / b.target };
+    case 'period':
+    case 'crush':
       if (b.progressLabel) {
         const [total, goal] = b.progressLabel.split('|').map(Number);
         return {
@@ -51,6 +83,10 @@ const progressInfo = (b: BadgeStatus, units: 'km' | 'mi'): { text: string; fract
         };
       }
       return { text: 'Not reached yet', fraction: 0 };
+    case 'time':
+    case 'comeback':
+    case 'source':
+      return { text: 'Not yet', fraction: 0 };
   }
 };
 
@@ -98,7 +134,7 @@ const Badges: React.FC<BadgesProps> = ({ isOpen, onClose, state, units }) => {
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-black text-sm uppercase text-black leading-tight">{b.name}</h3>
-                <p className="text-[11px] font-bold text-black/60 leading-snug mt-0.5">{b.description}</p>
+                <p className="text-[11px] font-bold text-black/60 leading-snug mt-0.5">{b.describe(units)}</p>
                 {b.earnedDate && (
                   <p className="text-[9px] font-black uppercase tracking-wider text-teal-700 mt-1">
                     Earned {formatDate(b.earnedDate)}
@@ -125,7 +161,7 @@ const Badges: React.FC<BadgesProps> = ({ isOpen, onClose, state, units }) => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-black text-sm uppercase text-gray-600 leading-tight">{b.name}</h3>
-                  <p className="text-[11px] font-bold text-gray-500 leading-snug mt-0.5">{b.description}</p>
+                  <p className="text-[11px] font-bold text-gray-500 leading-snug mt-0.5">{b.describe(units)}</p>
                   <div className="mt-1.5 h-2 border-2 border-gray-400 bg-white p-[1px]">
                     <div className="h-full bg-teal-accent" style={{ width: `${Math.min(100, Math.round(fraction * 100))}%` }} />
                   </div>

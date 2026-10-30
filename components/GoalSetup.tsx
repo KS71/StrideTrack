@@ -70,23 +70,19 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
   const unitLabel = getUnitLabel(units);
 
   return (
-    <div className="flex flex-col min-h-full bg-background-light font-display pb-4">
-      {/* Header */}
-      <div className="border-b-4 border-black bg-white px-4 pt-12 pb-3 sticky top-0 z-20">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black uppercase tracking-tight">SET YOUR TARGET</h1>
-          </div>
-          <button
-            onClick={() => onChangeView('settings')}
-            className="bg-white border-[3px] border-black p-2 shadow-hard-sm active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
-            <Settings size={28} className="text-black" strokeWidth={2.5} />
-          </button>
-        </div>
-      </div>
+    <div className="flex flex-col h-full bg-background-light font-display">
+      {/* Header - same style as Log Walk */}
+      <header className="flex justify-between items-center px-6 pt-8 pb-2 shrink-0">
+        <h1 className="text-2xl font-black text-black uppercase tracking-wider">Set Your Target</h1>
+        <button
+          onClick={() => onChangeView('settings')}
+          className="bg-white border-[3px] border-black p-2 shadow-hard-sm active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all">
+          <Settings size={24} className="text-black" strokeWidth={2.5} />
+        </button>
+      </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col p-4 gap-3 pb-8">
+      <div className="flex-1 min-h-0 flex flex-col justify-center px-6 py-3 gap-3">
 
         {/* Yellow Header Card - Compact */}
         <div className="bg-primary border-4 border-black p-2 shadow-hard relative overflow-hidden">
@@ -111,7 +107,7 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
         </div>
 
         {/* Distance Input Card - Compact */}
-        <div className="bg-white border-4 border-black p-3 shadow-hard text-center flex-1 flex flex-col justify-center min-h-[200px]">
+        <div className="bg-white border-4 border-black p-3 shadow-hard text-center flex flex-col justify-center flex-1 min-h-[180px] max-h-[22rem]">
           <div className="inline-block bg-black text-white text-[9px] font-bold uppercase px-1.5 py-0.5 mb-6">
             Distance Goal
           </div>
@@ -119,12 +115,12 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
           <div className="flex items-center justify-center gap-3 mb-1">
             <button
               onClick={handleDecrement}
-              className="w-8 h-8 flex items-center justify-center rounded-full border-4 border-black bg-white hover:bg-gray-100 active:translate-y-0.5 transition-transform"
+              className="w-11 h-11 flex items-center justify-center rounded-full border-4 border-black bg-white hover:bg-gray-100 active:translate-y-0.5 transition-transform"
             >
-              <span className="text-xl font-black mb-0.5">-</span>
+              <span className="text-2xl font-black mb-0.5">-</span>
             </button>
 
-            <div className="flex flex-col items-center w-32">
+            <div className="flex flex-col items-center w-40">
               <input
                 type="number"
                 inputMode="decimal"
@@ -135,19 +131,19 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
                   setIsSaved(false);
                 }}
                 onFocus={(e) => e.target.select()}
-                className="w-full text-center text-3xl font-black outline-none bg-transparent p-0 m-0"
+                className="w-full text-center text-5xl font-black outline-none bg-transparent p-0 m-0"
               />
             </div>
 
             <button
               onClick={handleIncrement}
-              className="w-8 h-8 flex items-center justify-center rounded-full border-4 border-black bg-white hover:bg-gray-100 active:translate-y-0.5 transition-transform"
+              className="w-11 h-11 flex items-center justify-center rounded-full border-4 border-black bg-white hover:bg-gray-100 active:translate-y-0.5 transition-transform"
             >
-              <span className="text-xl font-black mb-0.5">+</span>
+              <span className="text-2xl font-black mb-0.5">+</span>
             </button>
           </div>
 
-          <div className="text-sm font-bold uppercase text-gray-500 border-b-4 border-gray-200 inline-block px-4 pb-0.5">
+          <div className="text-base font-bold uppercase text-gray-500 border-b-4 border-gray-200 inline-block px-4 pb-0.5">
             {units === 'mi' ? 'Miles' : 'Kilometers'}
           </div>
         </div>
@@ -211,7 +207,6 @@ const GoalSetup: React.FC<GoalSetupProps> = ({ currentGoals, defaultPeriod, onBa
           )}
         </button>
 
-        <div className="h-4"></div> {/* Bottom spacer */}
 
       </div>
 

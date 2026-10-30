@@ -95,8 +95,8 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
   const unitLabel = getUnitLabel(units);
 
   return (
-    <div className="flex flex-col min-h-full bg-background-light font-display pb-4">
-      <header className="flex justify-between items-center px-6 pt-8 pb-2">
+    <div className="flex flex-col h-full bg-background-light font-display">
+      <header className="flex justify-between items-center px-6 pt-8 pb-2 shrink-0">
         <h1 className="text-2xl font-black text-black uppercase tracking-wider">{isEditing ? 'Edit Walk' : 'Log Walk'}</h1>
         <button
           onClick={() => isEditing ? onCancel() : onChangeView('settings')}
@@ -107,11 +107,11 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
         </button>
       </header>
 
-      <main className="flex-1 px-6 flex flex-col items-center justify-start gap-4 pt-2 pb-8">
+      <main className="flex-1 min-h-0 px-6 flex flex-col items-center justify-center gap-3 py-3">
         {/* Visual Sticker Container for Input - Reduced Height */}
-        <div className="w-full max-w-sm h-64 flex flex-col items-center justify-center bg-accent-pink border-[4px] border-black shadow-hard rounded-none relative overflow-hidden group shrink-0">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-white border-l-[4px] border-b-[4px] border-black rounded-none"></div>
-          <div className="absolute bottom-0 left-0 w-12 h-12 bg-primary border-r-[4px] border-t-[4px] border-black rounded-none"></div>
+        <div className="w-full max-w-sm flex-1 min-h-[9rem] max-h-52 flex flex-col items-center justify-center bg-accent-pink border-[4px] border-black shadow-hard rounded-none relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-12 h-12 bg-white border-l-[4px] border-b-[4px] border-black rounded-none"></div>
+          <div className="absolute bottom-0 left-0 w-10 h-10 bg-primary border-r-[4px] border-t-[4px] border-black rounded-none"></div>
 
           <div className="text-center z-10 w-full px-4">
             <div className="flex items-baseline justify-center">
@@ -121,23 +121,23 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
                 placeholder="0.0"
                 value={distance}
                 onChange={(e) => setDistance(e.target.value)}
-                className="bg-transparent border-none text-center text-8xl font-black text-black placeholder:text-black/20 focus:ring-0 focus:outline-none w-full p-0 m-0 caret-black leading-none tracking-tighter"
+                className="bg-transparent border-none text-center text-7xl font-black text-black placeholder:text-black/20 focus:ring-0 focus:outline-none w-full p-0 m-0 caret-black leading-none tracking-tighter"
               />
             </div>
-            <p className="text-2xl font-bold text-black mt-2 bg-white inline-block px-4 py-1 border-[3px] border-black shadow-hard-sm rounded-none uppercase">
+            <p className="text-xl font-bold text-black mt-2 bg-white inline-block px-3 py-0.5 border-[3px] border-black shadow-hard-sm rounded-none uppercase">
               {unitLabel}
             </p>
           </div>
         </div>
 
         {/* Title Input */}
-        <div className="w-full max-w-sm relative">
-          <div className="w-full bg-white border-[3px] border-black shadow-hard rounded-none p-4 flex items-center gap-4">
-            <div className="w-12 h-12 bg-primary border-2 border-black rounded-none flex items-center justify-center shadow-hard-sm shrink-0">
-              <Tag size={24} className="text-black" strokeWidth={2.5} />
+        <div className="w-full max-w-sm relative shrink-0">
+          <div className="w-full bg-white border-[3px] border-black shadow-hard rounded-none px-4 py-2.5 flex items-center gap-4">
+            <div className="w-10 h-10 bg-primary border-2 border-black rounded-none flex items-center justify-center shadow-hard-sm shrink-0">
+              <Tag size={20} className="text-black" strokeWidth={2.5} />
             </div>
             <div className="text-left flex-1 min-w-0">
-              <p className="text-xs font-bold text-black uppercase tracking-widest mb-1">Name</p>
+              <p className="text-[10px] font-bold text-black uppercase tracking-widest mb-0.5">Name</p>
               <input
                 type="text"
                 value={title}
@@ -151,21 +151,21 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
         </div>
 
         {/* Date Selector */}
-        <div className="w-full max-w-sm relative">
+        <div className="w-full max-w-sm relative shrink-0">
           <button
             onClick={openDatePicker}
-            className="w-full bg-primary border-[3px] border-black shadow-hard rounded-none p-4 flex items-center justify-between group active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+            className="w-full bg-primary border-[3px] border-black shadow-hard rounded-none px-4 py-2.5 flex items-center justify-between group active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white border-2 border-black rounded-none flex items-center justify-center shadow-hard-sm group-hover:bg-accent-pink transition-colors">
-                <Calendar size={24} className="text-black" strokeWidth={2.5} />
+              <div className="w-10 h-10 bg-white border-2 border-black rounded-none flex items-center justify-center shadow-hard-sm group-hover:bg-accent-pink transition-colors">
+                <Calendar size={20} className="text-black" strokeWidth={2.5} />
               </div>
               <div className="text-left">
-                <p className="text-xs font-bold text-black uppercase tracking-widest mb-1">Date</p>
+                <p className="text-[10px] font-bold text-black uppercase tracking-widest mb-0.5">Date</p>
                 <p className="text-lg font-bold text-black">{getDisplayDate(date)}</p>
               </div>
             </div>
-            <ChevronRight size={32} className="text-black" strokeWidth={2.5} />
+            <ChevronRight size={28} className="text-black" strokeWidth={2.5} />
           </button>
           <input
             ref={dateInputRef}
@@ -178,21 +178,21 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
         </div>
 
         {/* Time Selector */}
-        <div className="w-full max-w-sm relative">
+        <div className="w-full max-w-sm relative shrink-0">
           <button
             onClick={openTimePicker}
-            className="w-full bg-white border-[3px] border-black shadow-hard rounded-none p-4 flex items-center justify-between group active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+            className="w-full bg-white border-[3px] border-black shadow-hard rounded-none px-4 py-2.5 flex items-center justify-between group active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-accent-pink border-2 border-black rounded-none flex items-center justify-center shadow-hard-sm group-hover:bg-primary transition-colors">
-                <Clock size={24} className="text-black" strokeWidth={2.5} />
+              <div className="w-10 h-10 bg-accent-pink border-2 border-black rounded-none flex items-center justify-center shadow-hard-sm group-hover:bg-primary transition-colors">
+                <Clock size={20} className="text-black" strokeWidth={2.5} />
               </div>
               <div className="text-left">
-                <p className="text-xs font-bold text-black uppercase tracking-widest mb-1">Time</p>
+                <p className="text-[10px] font-bold text-black uppercase tracking-widest mb-0.5">Time</p>
                 <p className="text-lg font-bold text-black">{getDisplayTime()}</p>
               </div>
             </div>
-            <ChevronRight size={32} className="text-black" strokeWidth={2.5} />
+            <ChevronRight size={28} className="text-black" strokeWidth={2.5} />
           </button>
           <input
             ref={timeInputRef}
@@ -204,16 +204,16 @@ const LogWalk: React.FC<LogWalkProps> = ({ onCancel, onSave, units, currentView,
           />
         </div>
 
-        {/* Add to Goal Button - Inline with extra bottom margin */}
-        <div className="w-full max-w-sm mt-2 mb-8">
+        {/* Add to Goal Button */}
+        <div className="w-full max-w-sm shrink-0">
           <button
             onClick={handleSave}
             disabled={!distance || parseFloat(distance) <= 0}
-            className="w-full bg-teal-accent disabled:opacity-50 disabled:cursor-not-allowed border-[4px] border-black shadow-hard-lg rounded-none py-4 flex items-center justify-center gap-3 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all transform hover:-translate-y-1"
+            className="w-full bg-teal-accent disabled:opacity-50 disabled:cursor-not-allowed border-[4px] border-black shadow-hard-lg rounded-none py-3 flex items-center justify-center gap-3 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all transform hover:-translate-y-1"
           >
             {isEditing
-              ? <Check size={32} className="text-black" strokeWidth={2.5} />
-              : <PlusCircle size={32} className="text-black" strokeWidth={2.5} />}
+              ? <Check size={28} className="text-black" strokeWidth={2.5} />
+              : <PlusCircle size={28} className="text-black" strokeWidth={2.5} />}
             <span className="text-xl font-black text-black uppercase tracking-wide">{isEditing ? 'Save Changes' : 'Add to Goal'}</span>
           </button>
         </div>

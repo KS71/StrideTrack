@@ -7,10 +7,11 @@ interface BadgeCelebrationProps {
   badges: BadgeStatus[];       // newly earned badges to celebrate (1 or more)
   onClose: () => void;
   onViewAll: () => void;
+  units: 'km' | 'mi';
 }
 
 // Small pop-up shown once per newly earned badge, in the app's own style.
-const BadgeCelebration: React.FC<BadgeCelebrationProps> = ({ badges, onClose, onViewAll }) => {
+const BadgeCelebration: React.FC<BadgeCelebrationProps> = ({ badges, onClose, onViewAll, units }) => {
   if (badges.length === 0) return null;
   const many = badges.length > 1;
 
@@ -38,7 +39,7 @@ const BadgeCelebration: React.FC<BadgeCelebrationProps> = ({ badges, onClose, on
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-black text-sm uppercase text-black leading-tight">{b.name}</h3>
-                  <p className="text-[10px] font-bold text-black/60 leading-snug">{b.description}</p>
+                  <p className="text-[10px] font-bold text-black/60 leading-snug">{b.describe(units)}</p>
                 </div>
               </div>
             ))}

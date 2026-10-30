@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppState, View, Period } from '../types';
 import { calculateProgress, toDisplayDistance, getUnitLabel } from '../utils';
-import { TrendingUp, TrendingDown, Target, Settings, Flag, HardDriveDownload, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, Settings, Flag, HardDriveDownload, X, Award } from 'lucide-react';
 
 interface DashboardProps {
     state: AppState;
@@ -12,9 +12,10 @@ interface DashboardProps {
     showBackupReminder?: boolean;
     onBackupNow?: () => void;
     onDismissBackupReminder?: () => void;
+    onOpenBadges?: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units, weekStart, showBackupReminder, onBackupNow, onDismissBackupReminder }) => {
+const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units, weekStart, showBackupReminder, onBackupNow, onDismissBackupReminder, onOpenBadges }) => {
     // Current Period Target
     const rawTargetDistance = state.goals[state.activePeriod];
     // Stats calculation
@@ -90,10 +91,10 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
     const sundayIndex = weekStart === 'monday' ? 6 : 0;
 
     return (
-        <div className="flex flex-col min-h-full bg-background-light">
+        <div className="flex flex-col h-full bg-background-light">
             {/* Header - removed */}
 
-            <main className="my-auto px-4 py-4 space-y-3">
+            <main className="flex-1 min-h-0 flex flex-col justify-center px-4 py-3 gap-3">
                 {/* Period Selector */}
                 <div className="grid grid-cols-3 gap-0 border-[3px] border-black bg-white shadow-hard">
                     {(['week', 'month', 'year'] as Period[]).map((p) => (
@@ -112,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
 
                 {/* First-run hint - shown until the first walk is logged */}
                 {state.logs.length === 0 && (
-                    <div className="bg-white border-[3px] border-dashed border-black p-3 mt-4 text-center">
+                    <div className="bg-white border-[3px] border-dashed border-black p-3 mt-1 text-center">
                         <p className="font-black text-[11px] uppercase tracking-wider text-black">
                             Welcome to StrideTrack!
                         </p>
@@ -124,7 +125,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
 
                 {/* Backup reminder - only for users without cloud sync and an old/missing backup */}
                 {showBackupReminder && (
-                    <div className="bg-accent-pink border-[3px] border-black shadow-hard p-2.5 flex items-center gap-2.5 mt-4">
+                    <div className="bg-accent-pink border-[3px] border-black shadow-hard p-2.5 flex items-center gap-2.5 mt-1">
                         <div className="w-8 h-8 shrink-0 bg-white border-2 border-black flex items-center justify-center shadow-hard-sm">
                             <HardDriveDownload className="text-black" size={16} strokeWidth={2.5} />
                         </div>
@@ -153,7 +154,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                 )}
 
                 {/* Main Goal Card - Compact */}
-                <div className="w-full bg-primary border-[3px] border-black shadow-hard flex flex-col p-3 relative mt-4">
+                <div className="w-full bg-primary border-[3px] border-black shadow-hard flex flex-col p-3 relative mt-1">
                     <button
                         onClick={() => setView('settings')}
                         className="absolute top-3 left-3 w-8 h-8 bg-white border-2 border-black flex items-center justify-center shadow-hard-sm hover:translate-y-0.5 hover:shadow-none transition-all"
@@ -161,10 +162,11 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                         <Settings className="text-black" size={16} strokeWidth={2.5} />
                     </button>
                     <button
-                        onClick={() => setView('goal-setup')}
+                        onClick={onOpenBadges}
+                        aria-label="Badges"
                         className="absolute top-3 right-3 w-8 h-8 bg-white border-2 border-black flex items-center justify-center shadow-hard-sm hover:translate-y-0.5 hover:shadow-none transition-all"
                     >
-                        <Target className="text-black" size={16} strokeWidth={2.5} />
+                        <Award className="text-black" size={16} strokeWidth={2.5} />
                     </button>
                     <div className="flex justify-center">
                         <span className="inline-block bg-black text-white px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider mb-1">
@@ -249,7 +251,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                 </div>
 
                 {/* Consistency / Heatmap - Compact */}
-                <div className="space-y-2 pt-1">
+                <div className="flex-1 min-h-0 max-h-72 flex flex-col gap-2">
                     <div className="flex justify-between items-center">
                         <div className="bg-black text-white px-2 py-0.5 border-[3px] border-black">
                             <h2 className="text-xs font-black uppercase tracking-wider">Consistency</h2>
@@ -259,19 +261,19 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                         </span>
                     </div>
 
-                    <div className="bg-white border-[3px] border-black p-3 shadow-hard">
+                    <div className="flex-1 min-h-0 flex flex-col bg-white border-[3px] border-black p-3 shadow-hard">
                         <div className="grid grid-cols-7 gap-1.5 mb-1.5 border-b-2 border-black/10 pb-1">
                             {weekDaysHeader.map((day, i) => (
                                 <div key={i} className={`text-center text-[9px] font-black ${i === sundayIndex ? 'text-accent-pink' : 'text-black'}`}>{day}</div>
                             ))}
                         </div>
-                        <div className="flex flex-col gap-1.5">
+                        <div className="flex-1 min-h-0 grid grid-rows-4 gap-1.5">
                             {gridWeeks.map((week, wIndex) => (
-                                <div key={wIndex} className="grid grid-cols-7 gap-1.5">
+                                <div key={wIndex} className="grid grid-cols-7 gap-1.5 min-h-0">
                                     {week.map((day, dIndex) => (
                                         <div
                                             key={dIndex}
-                                            className={`aspect-square border-2 border-black transition-opacity ${day.hasWalk
+                                            className={`h-full max-w-full aspect-square mx-auto border-2 border-black transition-opacity ${day.hasWalk
                                                 ? 'bg-teal-accent'
                                                 : day.isFuture
                                                     ? 'bg-gray-100 opacity-50 border-gray-300' // Future days style

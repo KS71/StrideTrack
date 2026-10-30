@@ -94,6 +94,13 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.5.1:**
+- **29 Badges:** The badge set grows from 12 to 29, with more milestones for number of walks (25 to 1000), longest single walk (10 km, half marathon, marathon), a 100-day streak, 10 weeks and 6 months of reached goals in a row, double weekly goal, Early Bird, Night Owl, Comeback and Connected (Health Connect).
+- **Miles-Friendly Badges:** Distance badges have their own round targets in miles (e.g. 500 km / 300 mi), and descriptions show only the selected unit.
+- **Badges Shortcut:** The top-right button on the Dashboard goal card now opens Badges. Goal setup is still reachable from the bottom navigation bar.
+- **One-Screen Layouts:** Dashboard, Log Walk, Set Your Target and Yearly Progress now fit on one screen without scrolling, with content centred vertically. Inputs stay reachable when the keyboard is open.
+- **Consistent Headers:** Set Your Target now uses the same header style as Log Walk, and its goal card fills the available space.
+
 **v2.5.0:**
 - **Badges:** 12 achievements computed from your walking history, such as First Steps, Marathon (42.2 km total), On Fire (7-day streak), Week Warrior (weekly goal 3 weeks in a row) and Year Champion. Open them from the new Achievements section in Settings. Earned badges show the date they were unlocked; locked ones show how far you are from them.
 - **Badge Celebration:** A short pop-up appears the first time a new badge is earned, with a shortcut to the full list.
