@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap');
+/* Space Grotesk (SIL Open Font License) bundled locally so the app works
+   offline and never contacts Google Fonts. Variable font, weights 300-700;
+   heavier weights (font-black) are synthesized by the browser. */
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/SpaceGrotesk-latin.woff2") format("woff2");
+}
 
 @theme {
   --color-primary: #ffc900;

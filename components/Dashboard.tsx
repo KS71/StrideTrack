@@ -110,6 +110,18 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setView, setPeriod, units,
                     ))}
                 </div>
 
+                {/* First-run hint - shown until the first walk is logged */}
+                {state.logs.length === 0 && (
+                    <div className="bg-white border-[3px] border-dashed border-black p-3 mt-4 text-center">
+                        <p className="font-black text-[11px] uppercase tracking-wider text-black">
+                            Welcome to StrideTrack!
+                        </p>
+                        <p className="text-[10px] font-bold text-black/60 mt-1 leading-snug">
+                            Tap <span className="inline-block bg-accent-pink border-2 border-black px-1 text-black font-black leading-none">+</span> below to log your first walk, or connect a smartwatch under Settings.
+                        </p>
+                    </div>
+                )}
+
                 {/* Backup reminder - only for users without cloud sync and an old/missing backup */}
                 {showBackupReminder && (
                     <div className="bg-accent-pink border-[3px] border-black shadow-hard p-2.5 flex items-center gap-2.5 mt-4">

@@ -34,7 +34,8 @@ export interface UserPreferences {
   backupReminderDismissedAt?: string; // ISO string, hides the backup banner for a while
   lastSyncDate?: string;
   healthConnectSync?: boolean;
-  healthConnectSyncDate?: string;
+  healthConnectSyncDate?: string; // start of the sync window chosen when enabling
+  healthConnectLastSync?: string; // when Health Connect last imported walks
 }
 
 export interface AppState {

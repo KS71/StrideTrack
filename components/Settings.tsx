@@ -416,6 +416,11 @@ const Settings: React.FC<SettingsProps> = ({
                 {preferences.healthConnectSync ? (
                   <p className="text-[10px] text-green-700 font-bold uppercase leading-tight bg-green-50 border-[2px] border-green-300 p-2">
                     Active: Walks and hikes are automatically imported from your device.
+                    {preferences.healthConnectLastSync && (
+                      <span className="block mt-1 text-green-800/70 normal-case tracking-wide">
+                        Last import: {new Date(preferences.healthConnectLastSync).toLocaleDateString('en-GB')} {new Date(preferences.healthConnectLastSync).toLocaleTimeString(preferences.timeFormat === '24h' ? 'en-GB' : 'en-US', { hour: '2-digit', minute: '2-digit', hour12: preferences.timeFormat === '12h' })}
+                      </span>
+                    )}
                   </p>
                 ) : (
                   <p className="text-[10px] text-black/60 font-bold uppercase leading-tight bg-gray-50 border-[2px] border-black/20 p-2">
@@ -704,7 +709,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.4.2</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.4.3</span>
             </div>
           </div>
         </div>

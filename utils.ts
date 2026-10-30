@@ -108,7 +108,11 @@ export const calculateProgress = (allLogs: WalkLog[], period: Period, targetDist
   };
 };
 
-export const generateId = () => Math.random().toString(36).substr(2, 9);
+// Collision-safe id for new walks. Falls back to a random string on very old WebViews.
+export const generateId = (): string =>
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
 
 // Unit Conversion Helpers
 export const KM_TO_MILES = 0.621371;

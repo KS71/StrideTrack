@@ -489,7 +489,7 @@ const App: React.FC = () => {
           logs: mergedLogs,
           preferences: {
             ...prev.preferences,
-            lastSyncDate: new Date().toISOString()
+            healthConnectLastSync: new Date().toISOString()
           }
         };
 
@@ -726,7 +726,6 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, activePeriod: period }));
   };
 
-  // --- Export / Import Logic ---
   // --- Export / Import Logic ---
   const handleExportData = async () => {
     const dataStr = JSON.stringify(state, null, 2);

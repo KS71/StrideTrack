@@ -30,7 +30,7 @@
   Logikken er "hvis lokale mål er standard, hent fra skyen, ellers overskriv skyen". En ny telefon med ændrede mål overskriver altid skyen.
   *Løsning:* Sammenlign tidsstempel på seneste `goalHistory`-entry med profilens `updated_at`.
 
-- [ ] **1.7 "Last Synced" i skyen viser forkert tidspunkt**
+- [x] **1.7 "Last Synced" i skyen viser forkert tidspunkt** *(lavet okt. 2026, afventer test på telefon)*
   Både cloud-sync og Health Connect-sync skriver til det samme felt (`lastSyncDate`). Teksten "Last Synced" under cloud-kontoen i Settings kan derfor vise, hvornår Health Connect sidst kørte, selv om skyen ikke er blevet opdateret.
   *Løsning:* Giv Health Connect sit eget felt, fx `healthConnectLastSync`.
 
@@ -54,22 +54,22 @@
   - Log ud – `Settings.tsx`
   *Løsning:* Lav én genbrugelig `ConfirmDialog` og én lille besked-toast i appens stil, og udskift alle kald.
 
-- [ ] **2.4 Tom-tilstand / første-gang-hint**
+- [x] **2.4 Tom-tilstand / første-gang-hint** *(lavet okt. 2026, afventer test på telefon)*
   Med nul ture viser Dashboard bare nuller. Vis fx "Tryk + for at logge din første tur". Løser onboarding-ønsket fra testerne uden en tung tutorial.
 
 - [ ] **2.5 Synlig Health Connect-status**
   Sync kører automatisk, men brugeren kan ikke se det. Vis "Sidst synkroniseret for 3 min. siden" og en lille indikator, mens den kører.
 
-- [ ] **2.6 Bundl fonten lokalt**
+- [x] **2.6 Bundl fonten lokalt** *(lavet okt. 2026, afventer test på telefon)*
   Space Grotesk hentes fra Google Fonts ved hver start. Det virker ikke offline og pinger Google, hvilket strider mod appens privatlivsprofil. Læg fontfilerne i projektet.
 
-- [ ] **2.7 Ryd op i død kode og filer**
+- [x] **2.7 Ryd op i død kode og filer** *(lavet okt. 2026, afventer test på telefon)*
   - `tailwind.config.js` bruges ikke længere (Tailwind 4 bruger `@theme` i `index.css`).
   - `GEMINI_API_KEY` i `.env.local` og `vite.config.ts` bruges ikke af appen.
   - `theme`-prop'en på Dashboard bruges ikke.
   - Dobbelt kommentar `// --- Export / Import Logic ---` i `App.tsx`.
 
-- [ ] **2.8 Bedre id-generator**
+- [x] **2.8 Bedre id-generator** *(lavet okt. 2026, afventer test på telefon)*
   `generateId` bruger `Math.random().toString(36)` med 9 tegn. Brug `crypto.randomUUID()`, som allerede bruges i usage tracking, for at undgå kollisioner i skyen.
 
 - [ ] **2.9 Del `App.tsx` og `Settings.tsx` op**

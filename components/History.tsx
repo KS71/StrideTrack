@@ -309,6 +309,7 @@ const History: React.FC<HistoryProps> = ({ state, onDeleteLog, onEditLog, setVie
               <Footprints size={24} className="text-black" />
             </div>
             <p className="text-black font-bold uppercase tracking-wider text-center">No walks logged yet.</p>
+            <p className="text-black/70 font-bold text-xs text-center mt-2">Tap + below to log your first walk.</p>
           </div>
         )}
       </section>

@@ -93,6 +93,13 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.4.3:**
+- **Offline Font:** Space Grotesk is now bundled with the app instead of being fetched from Google Fonts on every launch. The app no longer contacts Google at startup and looks right without a network connection.
+- **First-Run Hint:** A fresh install now shows a short welcome box on the Dashboard and in History explaining how to log the first walk.
+- **Separate Health Connect Timestamp:** Health Connect imports no longer overwrite the cloud "Last Synced" time. Settings shows a dedicated "Last import" time under Health Connect.
+- **Collision-Safe Walk IDs:** New walks use `crypto.randomUUID()` instead of a short random string.
+- **Cleanup:** Removed the unused Tailwind v3 config, the unused Gemini API key wiring, and a duplicated comment.
+
 **v2.4.2:**
 - **Backup Reminder:** Users without a cloud account now see a banner on the Dashboard when their last backup file is over 30 days old (or was never taken), with a one-tap "Back up" button. Dismissing it hides it for 7 days.
 - **Fixed Streak Counting:** The streak in History now uses the phone's local date instead of UTC, so a walk logged just after midnight counts on the correct day.
