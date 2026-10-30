@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { UserPreferences } from '../types';
-import { User, MapPin, Calendar, Bell, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity, Globe, Stethoscope } from 'lucide-react';
+import { User, MapPin, Calendar, Bell, Download, Upload, HelpCircle, Smartphone, Shield, ChevronRight, Rocket, X, ArrowLeft, Cloud, RefreshCw, LogOut, Mail, Lock, Activity, Globe, Stethoscope, Award } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { Capacitor } from '@capacitor/core';
 import { requestHealthConnectPermissions, diagnoseHealthConnect, generateHealthConnectId, HealthConnectDiagnostics } from '../utils/healthConnect';
@@ -18,6 +18,9 @@ interface SettingsProps {
   onSync: (user: any, currentState?: any) => Promise<any>;
   onResetAllData: () => void;
   deletedHealthConnectIds?: string[];
+  onOpenBadges: () => void;
+  earnedBadgeCount: number;
+  totalBadgeCount: number;
 }
 
 interface ModalProps {
@@ -67,7 +70,10 @@ const Settings: React.FC<SettingsProps> = ({
   isSyncing,
   onSync,
   onResetAllData,
-  deletedHealthConnectIds = []
+  deletedHealthConnectIds = [],
+  onOpenBadges,
+  earnedBadgeCount,
+  totalBadgeCount
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showHelp, setShowHelp] = useState(false);
@@ -640,6 +646,26 @@ const Settings: React.FC<SettingsProps> = ({
           </div>
         </div>
 
+        {/* Achievements */}
+        <div>
+          <h3 className="text-lg font-black uppercase mb-4 bg-black text-white inline-block px-3 py-1 shadow-none">Achievements</h3>
+          <button
+            onClick={onOpenBadges}
+            className="w-full bg-white border-[3px] border-black shadow-hard p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="bg-primary border-[3px] border-black w-10 h-10 flex items-center justify-center shadow-none flex-shrink-0">
+                <Award size={20} className="text-black" strokeWidth={2.5} />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-bold text-black">Badges</span>
+                <span className="text-xs font-bold opacity-60 text-black text-left">{earnedBadgeCount} of {totalBadgeCount} earned</span>
+              </div>
+            </div>
+            <ChevronRight size={20} className="text-black" strokeWidth={2.5} />
+          </button>
+        </div>
+
         {/* Support */}
         <div>
           <h3 className="text-lg font-black uppercase mb-4 bg-black text-white inline-block px-3 py-1 shadow-none">Support</h3>
@@ -709,7 +735,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.4.3</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.5.0</span>
             </div>
           </div>
         </div>
@@ -1009,8 +1035,9 @@ const Settings: React.FC<SettingsProps> = ({
         icon={<Rocket size={24} className="text-black" strokeWidth={2.5} />}
       >
         <ul className="list-disc pl-5 space-y-2">
-          <li>Achievements & Badges</li>
-          <li>Dark Mode (The Real One)</li>
+          <li>Charts & statistics</li>
+          <li>Goal reminders</li>
+          <li>Home screen widget</li>
         </ul>
       </Modal>
 

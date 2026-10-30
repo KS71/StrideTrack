@@ -12,6 +12,9 @@ import GoalSetup from './components/GoalSetup';
 import Settings from './components/Settings';
 import Navigation from './components/Navigation';
 import YearlyOverview from './components/YearlyOverview';
+import Badges from './components/Badges';
+import BadgeCelebration from './components/BadgeCelebration';
+import { computeBadges, BadgeStatus } from './utils/badges';
 import { fetchRecentWalksAndHikes, isHealthConnectAvailable } from './utils/healthConnect';
 import { trackEvent } from './utils/usageTracking';
 import { supabase } from './supabaseClient';
@@ -700,6 +703,31 @@ const App: React.FC = () => {
     }
   };
 
+  // --- Badges ---
+  const [showBadges, setShowBadges] = useState(false);
+  const [newBadges, setNewBadges] = useState<BadgeStatus[]>([]);
+  const badgeStatuses = computeBadges(state);
+  const earnedBadgeCount = badgeStatuses.filter(b => b.earned).length;
+
+  // Whenever the walks or goals change, check for badges the user hasn't been
+  // congratulated for yet and pop the celebration.
+  useEffect(() => {
+    if (state.logs.length === 0) return;
+    const seen = new Set(state.seenBadgeIds || []);
+    const fresh = badgeStatuses.filter(b => b.earned && !seen.has(b.id));
+    setNewBadges(fresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.logs, state.goals, state.goalHistory, state.preferences.weekStart]);
+
+  const markBadgesSeen = () => {
+    const earnedIds = badgeStatuses.filter(b => b.earned).map(b => b.id);
+    setNewBadges([]);
+    setState(prev => ({
+      ...prev,
+      seenBadgeIds: Array.from(new Set([...(prev.seenBadgeIds || []), ...earnedIds]))
+    }));
+  };
+
   // --- Backup reminder ---
   // Users without a cloud account keep all their data on the phone only. Nudge
   // them to take a backup file if the last one is old (or never taken). Hidden
@@ -919,6 +947,9 @@ const App: React.FC = () => {
                     onSync={syncData}
                     onResetAllData={handleResetAllData}
                     deletedHealthConnectIds={state.deletedHealthConnectIds || []}
+                    onOpenBadges={() => setShowBadges(true)}
+                    earnedBadgeCount={earnedBadgeCount}
+                    totalBadgeCount={badgeStatuses.length}
                   />
                 )}
               </motion.div>
@@ -927,6 +958,17 @@ const App: React.FC = () => {
         </div>
 
         {/* Modals / Overlays */}
+        <Badges
+          isOpen={showBadges}
+          onClose={() => setShowBadges(false)}
+          state={state}
+          units={state.preferences.units}
+        />
+        <BadgeCelebration
+          badges={newBadges}
+          onClose={markBadgesSeen}
+          onViewAll={() => { markBadgesSeen(); setShowBadges(true); }}
+        />
         {showRecoveryModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
             <div className="bg-background-light w-full max-w-sm border-[4px] border-black shadow-hard-lg flex flex-col max-h-[85vh] animate-scale-up">

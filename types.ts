@@ -45,6 +45,7 @@ export interface AppState {
   activePeriod: Period;
   preferences: UserPreferences;
   deletedHealthConnectIds?: string[];
+  seenBadgeIds?: string[]; // badges the user has already been congratulated for
 }
 
 export type View = 'dashboard' | 'history' | 'log' | 'goal-setup' | 'settings' | 'yearly-overview';

@@ -46,7 +46,8 @@ A user-friendly Android app (.apk) designed to help you track your walks, set pe
 - **📊 Dashboard:** Get a full overview of your daily, weekly, and monthly progress directly on the front page.
 - **🎯 Goals:** Set personal goals for how much you want to walk per week, month, and year, and track how close you are to reaching them.
 - **📝 Log Walk:** Easy and quick logging of the distance you've walked on your latest trips.
-- **📅 History:** Coming in the next version.
+- **📅 History:** Every walk grouped by month, with totals, editing and deletion.
+- **🏆 Badges:** 12 achievements unlocked by your walking history, found under Settings → Achievements.
 - **⚙️ Settings:** Customize the app to your needs and easily delete your data.
 - **📱 Android App (.apk):** Built as a native app via Capacitor, ready to install on your Android phone.
 
@@ -92,6 +93,11 @@ To run the project locally on your own machine:
    ```
 
 ## 👨‍💻 Development & History
+
+**v2.5.0:**
+- **Badges:** 12 achievements computed from your walking history, such as First Steps, Marathon (42.2 km total), On Fire (7-day streak), Week Warrior (weekly goal 3 weeks in a row) and Year Champion. Open them from the new Achievements section in Settings. Earned badges show the date they were unlocked; locked ones show how far you are from them.
+- **Badge Celebration:** A short pop-up appears the first time a new badge is earned, with a shortcut to the full list.
+- **Roadmap Updated:** The "Coming Soon" list in Settings now reflects what is actually planned.
 
 **v2.4.3:**
 - **Offline Font:** Space Grotesk is now bundled with the app instead of being fetched from Google Fonts on every launch. The app no longer contacts Google at startup and looks right without a network connection.
