@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
@@ -14,9 +14,11 @@ import Navigation from './components/Navigation';
 import YearlyOverview from './components/YearlyOverview';
 import Badges from './components/Badges';
 import BadgeCelebration from './components/BadgeCelebration';
+import { useDialog } from './components/Dialog';
 import { computeBadges, BadgeStatus } from './utils/badges';
 import { fetchRecentWalksAndHikes, isHealthConnectAvailable } from './utils/healthConnect';
 import { trackEvent } from './utils/usageTracking';
+import { mergeWalks, resolveGoals, walkToRow, WalkRow, ProfileRow } from './utils/cloudSync';
 import { supabase } from './supabaseClient';
 import { X, Lock, RefreshCw } from 'lucide-react';
 
@@ -56,6 +58,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isHealthSyncing, setIsHealthSyncing] = useState(false);
+  const { confirm, notify } = useDialog();
 
   // The walk currently being edited (null = the Log screen is in "add new" mode)
   const [editingLog, setEditingLog] = useState<WalkLog | null>(null);
@@ -158,6 +161,11 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  // Always-current copy of the state for background cloud writes, so they never
+  // send stale goals/preferences captured in an old closure.
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   // Anonymous usage ping - no personal data, just counts app opens
   useEffect(() => {
@@ -271,127 +279,112 @@ const App: React.FC = () => {
     }
   };
 
-  // Robust Syncing Algorithm
+  // Cloud sync. Rules (see utils/cloudSync.ts):
+  //  - walks: newest copy wins (updatedAt vs updated_at), deletions are soft
+  //    (deleted_at) and retried from pendingCloudDeletes until the cloud confirms
+  //  - goals: newest wins (goalHistory vs goals_updated_at)
   const syncData = useCallback(async (currentUser = user, currentState = state) => {
     if (!currentUser) return { success: false, error: 'Not logged in' };
     setIsSyncing(true);
     try {
-      // 1. Fetch remote walks
-      const { data: remoteWalks, error: walksError } = await supabase
+      const now = new Date().toISOString();
+
+      // 1. Push deletions the cloud has not confirmed yet
+      const pendingDeletes = currentState.pendingCloudDeletes || [];
+      const confirmedDeletes: string[] = [];
+      for (const id of pendingDeletes) {
+        const { error } = await supabase
+          .from('walks')
+          .update({ deleted_at: now, updated_at: now })
+          .eq('id', id)
+          .eq('user_id', currentUser.id);
+        if (error) throw error;
+        confirmedDeletes.push(id);
+      }
+
+      // 2. Fetch remote walks (including soft-deleted ones) and profile
+      const { data: remoteWalksData, error: walksError } = await supabase
         .from('walks')
         .select('*')
         .eq('user_id', currentUser.id);
-
       if (walksError) throw walksError;
+      const remoteWalks = (remoteWalksData || []) as WalkRow[];
 
-      // 2. Fetch remote profile
       const { data: remoteProfile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', currentUser.id)
         .maybeSingle();
-
       if (profileError) throw profileError;
 
-      // 3. Sync Walks
-      const localWalks = currentState.logs;
-      const walksToUpload: any[] = [];
-
-      const remoteWalksMap = new Map(remoteWalks.map(w => [w.id, w]));
-
-      // Upload walks that only exist locally
-      for (const lw of localWalks) {
-        if (!remoteWalksMap.has(lw.id)) {
-          walksToUpload.push({
-            id: lw.id,
-            user_id: currentUser.id,
-            date: lw.date,
-            distance: lw.distance,
-            duration: lw.duration,
-            title: lw.title,
-            intensity: lw.intensity
-          });
-        }
-      }
-
-      if (walksToUpload.length > 0) {
-        const { error: uploadError } = await supabase.from('walks').insert(walksToUpload);
+      // 3. Walks: upload everything that is missing from, or newer than, the cloud
+      const merged = mergeWalks(currentState.logs, remoteWalks, [], now);
+      if (merged.toUpload.length > 0) {
+        const rows = merged.toUpload.map(w => walkToRow(w, currentUser.id));
+        const { error: uploadError } = await supabase.from('walks').upsert(rows);
         if (uploadError) throw uploadError;
       }
 
-      // 4. Sync Profile / Goals & Preferences
-      let finalGoals = currentState.goals;
+      // 4. Goals & preferences: newest goals win. Preferences are only pulled
+      //    down on a fresh install (default goals, nothing changed yet).
+      const resolution = resolveGoals(
+        currentState.goals,
+        currentState.goalHistory,
+        (remoteProfile as ProfileRow | null) || null
+      );
+      const finalGoals = resolution.goals;
+
+      const isFreshInstall =
+        currentState.goals.week === INITIAL_STATE.goals.week &&
+        currentState.goals.month === INITIAL_STATE.goals.month &&
+        currentState.goals.year === INITIAL_STATE.goals.year &&
+        (currentState.goalHistory?.length || 0) <= 1;
+
       let finalPref = currentState.preferences;
-
-      if (remoteProfile) {
-        // Remote profile exists: check if local is default or remote is newer
-        const isLocalDefaultGoals = 
-          currentState.goals.week === INITIAL_STATE.goals.week &&
-          currentState.goals.month === INITIAL_STATE.goals.month &&
-          currentState.goals.year === INITIAL_STATE.goals.year;
-
-        if (isLocalDefaultGoals) {
-          // Restore goals and preferences from remote profile
-          finalGoals = {
-            week: Number(remoteProfile.goals_week),
-            month: Number(remoteProfile.goals_month),
-            year: Number(remoteProfile.goals_year)
-          };
-          finalPref = {
-            ...finalPref,
-            units: remoteProfile.units as any,
-            weekStart: remoteProfile.week_start as any,
-            timeFormat: remoteProfile.time_format as any
-          };
-        }
+      if (remoteProfile && isFreshInstall) {
+        finalPref = {
+          ...finalPref,
+          units: (remoteProfile.units as any) || finalPref.units,
+          weekStart: (remoteProfile.week_start as any) || finalPref.weekStart,
+          timeFormat: (remoteProfile.time_format as any) || finalPref.timeFormat
+        };
       }
 
-      // Always write/update the remote profile to save the latest state AND record the last_sync date!
-      await supabase.from('profiles').upsert({
+      const { error: profileUpsertError } = await supabase.from('profiles').upsert({
         id: currentUser.id,
         goals_week: finalGoals.week,
         goals_month: finalGoals.month,
         goals_year: finalGoals.year,
+        goals_updated_at: resolution.goalsUpdatedAt,
         units: finalPref.units,
         week_start: finalPref.weekStart,
         time_format: finalPref.timeFormat,
-        last_sync: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        last_sync: now,
+        updated_at: now
       });
+      if (profileUpsertError) throw profileUpsertError;
 
-      // Update state with synchronized values, merging remote walks into the LATEST local logs (prev.logs)
-      // to prevent overwriting walks that were added while the async sync was in progress (race conditions)
+      // 5. Apply to the LATEST local state (prev), not the snapshot we synced from,
+      //    so walks added while the sync was running are not lost.
       setState(prev => {
-        const localWalksMap = new Map(prev.logs.map(w => [w.id, w]));
-        const mergedWalks = [...prev.logs];
-        let hasChanges = false;
+        const stillPending = (prev.pendingCloudDeletes || []).filter(id => !confirmedDeletes.includes(id));
+        const { logs } = mergeWalks(prev.logs, remoteWalks, stillPending, now);
 
-        for (const rw of remoteWalks) {
-          if (!localWalksMap.has(rw.id)) {
-            mergedWalks.push({
-              id: rw.id,
-              date: rw.date,
-              distance: Number(rw.distance),
-              duration: rw.duration,
-              title: rw.title,
-              intensity: (rw.intensity as any) || undefined
-            });
-            hasChanges = true;
-          }
-        }
-
-        if (hasChanges) {
-          mergedWalks.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        let goalHistory = prev.goalHistory || [];
+        if (resolution.source === 'remote') {
+          goalHistory = [...goalHistory, { date: resolution.goalsUpdatedAt, goals: finalGoals }];
         }
 
         return {
           ...prev,
-          logs: mergedWalks,
+          logs,
           goals: finalGoals,
+          goalHistory,
+          pendingCloudDeletes: stillPending,
           preferences: {
             ...prev.preferences,
             ...finalPref,
-            lastSyncDate: new Date().toISOString()
+            lastSyncDate: now
           }
         };
       });
@@ -428,16 +421,18 @@ const App: React.FC = () => {
 
     if (user && nextPref) {
       try {
-        await supabase.from('profiles').upsert({
+        const goals = stateRef.current.goals;
+        const { error } = await supabase.from('profiles').upsert({
           id: user.id,
-          goals_week: state.goals.week,
-          goals_month: state.goals.month,
-          goals_year: state.goals.year,
+          goals_week: goals.week,
+          goals_month: goals.month,
+          goals_year: goals.year,
           units: (nextPref as UserPreferences).units,
           week_start: (nextPref as UserPreferences).weekStart,
           time_format: (nextPref as UserPreferences).timeFormat,
           updated_at: new Date().toISOString()
         });
+        if (error) throw error;
       } catch (e) {
         console.error("Failed to sync preferences in background", e);
       }
@@ -458,6 +453,11 @@ const App: React.FC = () => {
 
       if (recentWalks.length === 0) {
         console.log('No new walks/hikes found in Health Connect.');
+        // Still a successful check: show it as "last checked" in Settings
+        setState(prev => ({
+          ...prev,
+          preferences: { ...prev.preferences, healthConnectLastSync: new Date().toISOString() }
+        }));
         return;
       }
 
@@ -556,7 +556,8 @@ const App: React.FC = () => {
       date: logDate,
       distance,
       duration: '0m 0s',
-      title: cleanTitle || 'New Walk'
+      title: cleanTitle || 'New Walk',
+      updatedAt: new Date().toISOString()
     };
 
     setState(prev => ({
@@ -566,16 +567,11 @@ const App: React.FC = () => {
     changeView('dashboard');
     trackEvent('walk_logged');
 
+    // Background push. If it fails, the next sync uploads it (missing or newer locally).
     if (user) {
       try {
-        await supabase.from('walks').insert({
-          id: newLog.id,
-          user_id: user.id,
-          date: newLog.date,
-          distance: newLog.distance,
-          duration: newLog.duration,
-          title: newLog.title
-        });
+        const { error } = await supabase.from('walks').upsert(walkToRow(newLog, user.id));
+        if (error) throw error;
       } catch (e) {
         console.error("Failed to sync new walk log to Supabase in background", e);
       }
@@ -601,22 +597,21 @@ const App: React.FC = () => {
 
     const cleanTitle = title?.trim();
     const finalTitle = cleanTitle || 'New Walk';
+    const updatedAt = new Date().toISOString();
+    const updatedLog: WalkLog = { ...editingLog, distance, date: logDate, title: finalTitle, updatedAt };
 
     setState(prev => ({
       ...prev,
-      logs: prev.logs.map(l =>
-        l.id === id ? { ...l, distance, date: logDate, title: finalTitle } : l
-      )
+      logs: prev.logs.map(l => (l.id === id ? { ...l, ...updatedLog } : l))
     }));
     setEditingLog(null);
     changeView('history');
 
+    // Background push. If it fails, the next sync sees the newer updatedAt and re-uploads.
     if (user) {
       try {
-        await supabase.from('walks')
-          .update({ distance, date: logDate, title: finalTitle })
-          .eq('id', id)
-          .eq('user_id', user.id);
+        const { error } = await supabase.from('walks').upsert(walkToRow(updatedLog, user.id));
+        if (error) throw error;
       } catch (e) {
         console.error("Failed to sync edited walk to Supabase in background", e);
       }
@@ -624,17 +619,32 @@ const App: React.FC = () => {
   };
 
   const handleDeleteLog = async (id: string) => {
+    // Remember the deletion until the cloud confirms it, so a failed request
+    // (e.g. offline) cannot bring the walk back at the next sync.
     setState(prev => ({
       ...prev,
       logs: prev.logs.filter(log => log.id !== id),
       deletedHealthConnectIds: id.startsWith('hc_')
         ? [...(prev.deletedHealthConnectIds || []), id]
-        : prev.deletedHealthConnectIds
+        : prev.deletedHealthConnectIds,
+      pendingCloudDeletes: user
+        ? Array.from(new Set([...(prev.pendingCloudDeletes || []), id]))
+        : prev.pendingCloudDeletes
     }));
 
     if (user) {
       try {
-        await supabase.from('walks').delete().eq('id', id).eq('user_id', user.id);
+        const now = new Date().toISOString();
+        const { error } = await supabase
+          .from('walks')
+          .update({ deleted_at: now, updated_at: now })
+          .eq('id', id)
+          .eq('user_id', user.id);
+        if (error) throw error;
+        setState(prev => ({
+          ...prev,
+          pendingCloudDeletes: (prev.pendingCloudDeletes || []).filter(p => p !== id)
+        }));
       } catch (e) {
         console.error("Failed to delete walk from Supabase in background", e);
       }
@@ -642,16 +652,23 @@ const App: React.FC = () => {
   };
 
   const handleResetAllData = async () => {
-    // First warning
-    const first = window.confirm(
-      "⚠️ Delete All Data?\n\nThis will permanently erase all your walks, goals, and settings from this device.\n\nThis cannot be undone. Are you sure you want to continue?"
-    );
+    // Two confirmations, both in the app's own style
+    const first = await confirm({
+      title: 'Delete All Data?',
+      message: 'This will permanently erase all your walks, goals and settings from this device.',
+      detail: 'This cannot be undone.',
+      confirmLabel: 'Continue',
+      tone: 'danger'
+    });
     if (!first) return;
 
-    // Second warning – extra confirmation
-    const second = window.confirm(
-      "🚨 FINAL WARNING\n\nYou are about to permanently delete ALL your walking history and goals.\n\nThere is no way to recover this data unless you have a backup file.\n\nPress OK to delete everything now."
-    );
+    const second = await confirm({
+      title: 'Final Warning',
+      message: 'You are about to permanently delete ALL your walking history and goals.',
+      detail: 'There is no way to recover this data unless you have a backup file.',
+      confirmLabel: 'Delete everything',
+      tone: 'danger'
+    });
     if (!second) return;
 
     // Sign out of Supabase if logged in (cloud data stays, only local is cleared)
@@ -671,6 +688,7 @@ const App: React.FC = () => {
 
   const handleUpdateGoal = async (period: Period, distance: number) => {
     let nextGoals: any = null;
+    const changedAt = new Date().toISOString();
     setState(prev => {
       const newGoals = {
         ...prev.goals,
@@ -679,7 +697,7 @@ const App: React.FC = () => {
       nextGoals = newGoals;
 
       const newHistoryEntry = {
-        date: new Date().toISOString(),
+        date: changedAt,
         goals: newGoals
       };
 
@@ -690,18 +708,22 @@ const App: React.FC = () => {
       };
     });
 
+    // Background push. If it fails, the next sync compares goals_updated_at and re-sends.
     if (user && nextGoals) {
       try {
-        await supabase.from('profiles').upsert({
+        const prefs = stateRef.current.preferences;
+        const { error } = await supabase.from('profiles').upsert({
           id: user.id,
           goals_week: nextGoals.week,
           goals_month: nextGoals.month,
           goals_year: nextGoals.year,
-          units: state.preferences.units,
-          week_start: state.preferences.weekStart,
-          time_format: state.preferences.timeFormat,
-          updated_at: new Date().toISOString()
+          goals_updated_at: changedAt,
+          units: prefs.units,
+          week_start: prefs.weekStart,
+          time_format: prefs.timeFormat,
+          updated_at: changedAt
         });
+        if (error) throw error;
       } catch (e) {
         console.error("Failed to sync goal update to Supabase in background", e);
       }
@@ -789,7 +811,7 @@ const App: React.FC = () => {
         }));
       } catch (e) {
         console.error('Export failed', e);
-        alert('Export failed: ' + (e as any).message);
+        notify('Export failed: ' + (e as any).message, 'error');
       }
     } else {
       // Web fallback
@@ -829,12 +851,12 @@ const App: React.FC = () => {
           };
           setState(mergedData);
           changeView('dashboard');
-          alert('Backup restored successfully!');
+          notify('Backup restored successfully!', 'success');
         } else {
-          alert('Invalid backup file format.');
+          notify('Invalid backup file format.', 'error');
         }
       } catch (error) {
-        alert('Error reading backup file.');
+        notify('Error reading backup file.', 'error');
         console.error(error);
       }
     };
@@ -951,6 +973,8 @@ const App: React.FC = () => {
                     user={user}
                     isSyncing={isSyncing}
                     onSync={syncData}
+                    isHealthSyncing={isHealthSyncing}
+                    onHealthSync={syncWithHealthConnect}
                     onResetAllData={handleResetAllData}
                     deletedHealthConnectIds={state.deletedHealthConnectIds || []}
                     onOpenBadges={() => setShowBadges(true)}
@@ -970,7 +994,19 @@ const App: React.FC = () => {
           state={state}
           units={state.preferences.units}
         />
-        <BadgeCelebration
+        {/* Small indicator while a background sync is running. Fixed, so it never shifts the layout. */}
+      {(isHealthSyncing || isSyncing) && (
+        <div className="fixed left-1/2 -translate-x-1/2 z-[70] pointer-events-none" style={{ top: 'calc(8px + env(safe-area-inset-top))' }}>
+          <div className="bg-white border-[3px] border-black shadow-hard-sm px-3 py-1.5 flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <RefreshCw size={12} className="animate-spin text-black" strokeWidth={3} />
+            <span className="font-black text-[10px] uppercase tracking-wider text-black">
+              {isHealthSyncing ? 'Syncing Health Connect' : 'Syncing cloud'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <BadgeCelebration
           badges={newBadges}
           onClose={markBadgesSeen}
           onViewAll={() => { markBadgesSeen(); setShowBadges(true); }}

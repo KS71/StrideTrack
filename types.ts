@@ -11,6 +11,7 @@ export interface WalkLog {
   intensity?: 'Low' | 'Medium' | 'High';
   calories?: number;
   source?: string;
+  updatedAt?: string; // ISO string of the last local change; used by cloud sync ("newest wins")
 }
 
 export interface Goals {
@@ -45,6 +46,7 @@ export interface AppState {
   activePeriod: Period;
   preferences: UserPreferences;
   deletedHealthConnectIds?: string[];
+  pendingCloudDeletes?: string[]; // walk ids deleted locally but not yet confirmed deleted in the cloud
   seenBadgeIds?: string[]; // badges the user has already been congratulated for
 }
 

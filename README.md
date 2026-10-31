@@ -94,6 +94,12 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.6.0:**
+- **Reliable Cloud Sync:** Every walk now carries a last-changed timestamp and the newest copy wins when syncing, so edits made offline are no longer lost. Deleting a walk marks it as deleted in the cloud (and retries until confirmed), so deleted walks can no longer reappear on the next sync, and other devices remove them too. Goals carry their own timestamp, so a new phone no longer overwrites the goals in the cloud. Requires the Supabase migration in `supabase/2026-10-31_sync_timestamps.sql`; deleted rows are purged after 30 days by `supabase/2026-10-31_purge_deleted_walks.sql`.
+- **App-Styled Dialogs:** All system pop-ups (delete all data, backup messages, Health Connect toggles, log out) are replaced by a confirm dialog and toast in the app's own style (`components/Dialog.tsx`).
+- **Visible Health Connect Status:** Settings shows "Last checked: 3 min ago" (also when nothing new was found) and a "Sync now" button. A small indicator appears at the top of the screen while a Health Connect or cloud sync is running.
+- **Privacy Policy:** Website updated to describe how deleted walks are handled in the cloud.
+
 **v2.5.1:**
 - **29 Badges:** The badge set grows from 12 to 29, with more milestones for number of walks (25 to 1000), longest single walk (10 km, half marathon, marathon), a 100-day streak, 10 weeks and 6 months of reached goals in a row, double weekly goal, Early Bird, Night Owl, Comeback and Connected (Health Connect).
 - **Miles-Friendly Badges:** Distance badges have their own round targets in miles (e.g. 500 km / 300 mi), and descriptions show only the selected unit.

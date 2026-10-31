@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { DialogProvider } from './components/Dialog';
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -57,7 +58,9 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <App />
+      <DialogProvider>
+        <App />
+      </DialogProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );

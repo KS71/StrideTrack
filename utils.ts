@@ -157,3 +157,18 @@ export const getGoalForDate = (date: Date, state: AppState): Goals => {
   // return the oldest known goal to be safe, or just current goals if we prefer.
   return sortedHistory[sortedHistory.length - 1].goals;
 };
+/** Short relative time for status lines: "just now", "3 min ago", "2 h ago", "yesterday", "5 days ago". */
+export const timeAgo = (iso: string | undefined | null, now: Date = new Date()): string => {
+  if (!iso) return 'never';
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return 'never';
+  const sec = Math.max(0, Math.round((now.getTime() - t) / 1000));
+  if (sec < 60) return 'just now';
+  const min = Math.round(sec / 60);
+  if (min < 60) return `${min} min ago`;
+  const hours = Math.round(min / 60);
+  if (hours < 24) return `${hours} h ago`;
+  const days = Math.round(hours / 24);
+  if (days === 1) return 'yesterday';
+  return `${days} days ago`;
+};

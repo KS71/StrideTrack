@@ -6,6 +6,8 @@ import { Capacitor } from '@capacitor/core';
 import { requestHealthConnectPermissions, diagnoseHealthConnect, generateHealthConnectId, HealthConnectDiagnostics } from '../utils/healthConnect';
 import { isTrackingExcluded, setTrackingExcluded } from '../utils/usageTracking';
 import { Health } from '@capgo/capacitor-health';
+import { useDialog } from './Dialog';
+import { timeAgo } from '../utils';
 
 interface SettingsProps {
   preferences: UserPreferences;
@@ -16,6 +18,8 @@ interface SettingsProps {
   user: any;
   isSyncing: boolean;
   onSync: (user: any, currentState?: any) => Promise<any>;
+  isHealthSyncing?: boolean;
+  onHealthSync?: () => Promise<void> | void;
   onResetAllData: () => void;
   deletedHealthConnectIds?: string[];
   onOpenBadges: () => void;
@@ -69,6 +73,8 @@ const Settings: React.FC<SettingsProps> = ({
   user,
   isSyncing,
   onSync,
+  isHealthSyncing = false,
+  onHealthSync,
   onResetAllData,
   deletedHealthConnectIds = [],
   onOpenBadges,
@@ -107,21 +113,31 @@ const Settings: React.FC<SettingsProps> = ({
   const [changePasswordSuccess, setChangePasswordSuccess] = useState<string | null>(null);
 
   const isNative = Capacitor.isNativePlatform();
+  const { confirm, notify } = useDialog();
 
   const handleToggleHealthConnect = async () => {
     if (preferences.healthConnectSync) {
-      if (window.confirm("Are you sure you want to disable Health Connect sync? This will stop automatic importing of walks.")) {
+      const ok = await confirm({
+        title: 'Disable Sync?',
+        message: 'Automatic importing of walks from Health Connect will stop. Walks already imported stay in your history.',
+        confirmLabel: 'Disable',
+        tone: 'danger'
+      });
+      if (ok) {
         onUpdatePreferences({ healthConnectSync: false });
       }
     } else {
       const success = await requestHealthConnectPermissions();
       if (success) {
         // Ask the user if they want to import past history or only sync from now on
-        const importHistory = window.confirm(
-          "Would you like to import your past walk and hike history from Health Connect?\n\n" +
-          "• Click OK to import your activities from the past 30 days.\n" +
-          "• Click Cancel to only sync new activities from this moment forward."
-        );
+        const importHistory = await confirm({
+          title: 'Import History?',
+          message: 'Would you like to import your walks and hikes from the past 30 days from Health Connect?',
+          detail: 'Choose "From now" to only sync new activities.',
+          confirmLabel: 'Past 30 days',
+          cancelLabel: 'From now',
+          tone: 'teal'
+        });
 
         const syncDate = importHistory 
           ? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() // Past 30 days
@@ -133,12 +149,12 @@ const Settings: React.FC<SettingsProps> = ({
         });
         
         if (importHistory) {
-          alert("Google Health Connect sync enabled! We will import walks from the past 30 days shortly.");
+          notify('Health Connect sync enabled. Importing the past 30 days.', 'success');
         } else {
-          alert("Google Health Connect sync enabled! Only walks completed from this moment forward will be synced.");
+          notify('Health Connect sync enabled. New walks will be synced.', 'success');
         }
       } else {
-        alert("Could not enable sync. Please ensure Google Health Connect is installed on your device and permissions are granted.");
+        notify('Could not enable sync. Check that Health Connect is installed and permissions are granted.', 'error');
       }
     }
   };
@@ -176,9 +192,9 @@ const Settings: React.FC<SettingsProps> = ({
     if (!diagnostics) return;
     try {
       await navigator.clipboard.writeText(JSON.stringify(diagnostics, null, 2));
-      alert('Diagnostics report copied to clipboard.');
+      notify('Diagnostics report copied to clipboard.', 'success');
     } catch (e) {
-      alert('Could not copy to clipboard on this device.');
+      notify('Could not copy to clipboard on this device.', 'error');
     }
   };
 
@@ -187,7 +203,7 @@ const Settings: React.FC<SettingsProps> = ({
       await Health.openHealthConnectSettings();
     } catch (e) {
       console.error("Could not open Health Connect settings", e);
-      alert("Could not open Health Connect settings. Please open them manually via your phone's Settings app.");
+      notify("Could not open Health Connect settings. Open them via your phone's Settings app.", 'error');
     }
   };
 
@@ -242,7 +258,13 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   const handleLogout = async () => {
-    if (window.confirm("Are you sure you want to log out? Your local walks will be preserved on this device.")) {
+    const ok = await confirm({
+      title: 'Log Out?',
+      message: 'Your walks stay on this device. Cloud sync stops until you log in again.',
+      confirmLabel: 'Log out',
+      tone: 'primary'
+    });
+    if (ok) {
       await supabase.auth.signOut();
     }
   };
@@ -420,14 +442,26 @@ const Settings: React.FC<SettingsProps> = ({
             {isNative && (
               <div className="flex flex-col gap-2">
                 {preferences.healthConnectSync ? (
-                  <p className="text-[10px] text-green-700 font-bold uppercase leading-tight bg-green-50 border-[2px] border-green-300 p-2">
-                    Active: Walks and hikes are automatically imported from your device.
-                    {preferences.healthConnectLastSync && (
+                  <div className="text-[10px] text-green-700 font-bold uppercase leading-tight bg-green-50 border-[2px] border-green-300 p-2 flex items-center justify-between gap-2">
+                    <div>
+                      Active: Walks and hikes are imported automatically.
                       <span className="block mt-1 text-green-800/70 normal-case tracking-wide">
-                        Last import: {new Date(preferences.healthConnectLastSync).toLocaleDateString('en-GB')} {new Date(preferences.healthConnectLastSync).toLocaleTimeString(preferences.timeFormat === '24h' ? 'en-GB' : 'en-US', { hour: '2-digit', minute: '2-digit', hour12: preferences.timeFormat === '12h' })}
+                        {isHealthSyncing
+                          ? 'Checking Health Connect…'
+                          : `Last checked: ${timeAgo(preferences.healthConnectLastSync)}`}
                       </span>
+                    </div>
+                    {onHealthSync && (
+                      <button
+                        onClick={() => onHealthSync()}
+                        disabled={isHealthSyncing}
+                        className="shrink-0 bg-white border-[3px] border-black px-2.5 py-1.5 font-black text-[10px] uppercase shadow-hard-sm hover:translate-y-[-1px] hover:shadow-hard active:translate-y-0 transition-all text-black flex items-center gap-1 disabled:opacity-60"
+                      >
+                        <RefreshCw size={12} className={isHealthSyncing ? 'animate-spin' : ''} strokeWidth={3} />
+                        {isHealthSyncing ? 'Syncing' : 'Sync now'}
+                      </button>
                     )}
-                  </p>
+                  </div>
                 ) : (
                   <p className="text-[10px] text-black/60 font-bold uppercase leading-tight bg-gray-50 border-[2px] border-black/20 p-2">
                     Connect your device to automatically sync walks from your smartwatch!
@@ -735,7 +769,7 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
                 <span className="font-bold text-black">Version</span>
               </div>
-              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.5.1</span>
+              <span className="text-xs font-black bg-black text-white px-2 py-1">v2.6.0</span>
             </div>
           </div>
         </div>
