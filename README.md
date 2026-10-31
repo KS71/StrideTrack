@@ -94,6 +94,11 @@ To run the project locally on your own machine:
 
 ## 👨‍💻 Development & History
 
+**v2.6.1:**
+- **Monthly Chart:** Yearly Progress replaces the 12 month boxes with a bar chart of distance per month in the app's style: yellow bars, green when the monthly goal was reached, a dashed line for the current monthly goal, the current month framed and future months as dashed stubs. Plain SVG, no chart library.
+- **This Year Stats:** 14 colour-coded tiles under the chart: walks, distance, walks per week, average per walk/day/week/month, longest walk, best month, best week, goal months reached, active days, longest streak and distance compared to the same date last year. Pink = counts, yellow = distance, green = records, teal = consistency.
+- Yearly Progress now scrolls when the content is taller than the screen.
+
 **v2.6.0:**
 - **Reliable Cloud Sync:** Every walk now carries a last-changed timestamp and the newest copy wins when syncing, so edits made offline are no longer lost. Deleting a walk marks it as deleted in the cloud (and retries until confirmed), so deleted walks can no longer reappear on the next sync, and other devices remove them too. Goals carry their own timestamp, so a new phone no longer overwrites the goals in the cloud. Requires the Supabase migration in `supabase/2026-10-31_sync_timestamps.sql`; deleted rows are purged after 30 days by `supabase/2026-10-31_purge_deleted_walks.sql`.
 - **App-Styled Dialogs:** All system pop-ups (delete all data, backup messages, Health Connect toggles, log out) are replaced by a confirm dialog and toast in the app's own style (`components/Dialog.tsx`).

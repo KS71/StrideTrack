@@ -41,8 +41,9 @@
 
 ## ✨ 2. Forbedringer af det eksisterende
 
-- [ ] **2.1 Grafer med Recharts**
+- [x] **2.1 Grafer** *(udgivet i 2.6.1)*
   `recharts` er installeret, men bruges ikke. Søjlediagram med distance pr. måned i Yearly Overview og/eller pr. dag i ugen på Dashboard, i neo-brutalistisk stil.
+  *Løsning (okt. 2026, forslag A valgt):* Søjlediagrammet erstatter de 12 måneds-bokse i Yearly Progress. Gul = distance, grøn = månedsmål nået, stiplet linje = aktuelt månedsmål, indeværende måned er indrammet, fremtidige måneder er stiplede stubbe. Bedste måned har tal. Lavet i ren SVG (ingen Recharts) for at ramme stilen præcist og holde bundle'et lille. `recharts` kan fjernes fra `package.json`. Dashboard-grafen (forslag B) er ikke lavet. Under grafen kom desuden en "This year"-sektion med 14 farvekodede nøgletal (pink = antal, gul = distance, grøn = rekorder, teal = vedholdenhed), og siden må scrolle.
 
 - [ ] **2.2 Fortryd ved sletning**
   Gælder sletning af en gåtur i History. Langt tryk åbner allerede en bekræftelsesdialog ("Delete Walk?") i appens egen stil, så turen slettes ikke ved et uheld.
@@ -120,5 +121,5 @@
 1. ~~Fejl 1.4 – 1.6 (cloud sync)~~ *rettet, afventer migration + test*
 2. ~~2.3 Egen bekræftelsesdialog~~, ~~2.5 Health Connect-status~~ *lavet, afventer test* (3.5 droppet)
 3. 3.2 Påmindelser, 3.3 Del milepæl, 3.4 Bedøm appen
-4. 2.1 Grafer
+4. ~~2.1 Grafer~~ *udgivet i 2.6.1*
 6. 2.9 Opdeling af `App.tsx` / `Settings.tsx` og 3.7 Widget efter lyst
